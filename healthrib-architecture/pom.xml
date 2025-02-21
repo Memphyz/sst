@@ -5,14 +5,5 @@
     <artifactId>riboso</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>healthrib-model</artifactId>
-  <name>healthrib-model</name>
-  <description>Modelos do projeto HeathRIb</description>
-    <dependencies>
-    <dependency>
-        <groupId>com.healthrib</groupId>
-        <artifactId>healthrib-architecture</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <artifactId>healthrib-architecture</artifactId>
 </project>

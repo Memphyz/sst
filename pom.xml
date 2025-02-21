@@ -15,6 +15,7 @@
 	   <module>healthrib-api</module>
 	   <module>healthrib-assembler</module>
 	   <module>healthrib-authorization</module>
+	   <module>healthrib-architecture</module>
 	</modules>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -35,6 +36,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
