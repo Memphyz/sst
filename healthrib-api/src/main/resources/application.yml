@@ -7,4 +7,5 @@ spring:
   cloud:
     config:
       profile: dev
-    
+server:
+  port: 8080

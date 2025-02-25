@@ -1,7 +1,6 @@
-package com.healthrib.validations;
+package com.healthrib.annotations;
 
-
-import static com.healthrib.enums.messages.ValidationMessagesType.NOT_BLANK;
+import static com.healthrib.enums.ValidationMessagesType.EMAIL;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
@@ -15,45 +14,57 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import com.healthrib.enums.messages.ValidationMessagesType;
-import com.healthrib.validations.NotBlank.List;
+import com.healthrib.annotations.Email.List;
+import com.healthrib.enums.ValidationMessagesType;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
+
 /**
  * The annotated element must not be {@code null} and must contain at least one
- * non-whitespace character. Accepts {@code CharSequence}.
+ * only allow strings with email regex pattern: ^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$
  *
- * @author Hardy Ferentschik
- * @modified Lucas Ribeiro
+ * <br>
+ * <br>
+ * <strong>Examples:</strong>
+ * <ul>
+ * <ol>null ---> false</ol>
+ * <ol>"" ---> false</ol>
+ * <ol>test ---> false</ol>
+ * <ol>test@ ---> false</ol>
+ * <ol>test@company.com ---> true</ol>
+ * <ol>test@company.com.br ---> true</ol>
+ *  <ol>company@company.com.br ---> true</ol>
+ * </ul>
+ *
+ * @author Lucas Ribeiro
  * @since 2.0
- *
- * @see Character#isWhitespace(char)
  */
 @Documented
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
-public @interface NotBlank {
+public @interface Email {
 	
-
-	ValidationMessagesType message() default NOT_BLANK;
+	ValidationMessagesType message() default EMAIL;
 
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
-
+	
 	/**
-	 * Defines several {@code @NotBlank} constraints on the same element.
+	 * Defines several {@link Email} annotations on the same element.
 	 *
-	 * @see NotBlank
+	 * @see com.healthrib.annotations.Email
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 	@Retention(RUNTIME)
 	@Documented
-	public @interface List {
-		NotBlank[] value();
+	@interface List {
+
+		Email[] value();
 	}
+
 }

@@ -1,6 +1,6 @@
-package com.healthrib.abstracts.validators;
+package com.healthrib.annotations.implementations;
 
-import com.healthrib.validations.Size;
+import com.healthrib.annotations.Size;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

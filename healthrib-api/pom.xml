@@ -6,4 +6,16 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>healthrib-api</artifactId>
+    <dependencies>
+    <dependency>
+        <groupId>com.healthrib</groupId>
+        <artifactId>healthrib-authorization</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>com.healthrib</groupId>
+        <artifactId>healthrib-service</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

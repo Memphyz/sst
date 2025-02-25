@@ -1,6 +1,7 @@
-package com.healthrib.validations;
+package com.healthrib.annotations;
 
-import static com.healthrib.enums.messages.ValidationMessagesType.NOT_NULL;
+
+import static com.healthrib.enums.ValidationMessagesType.NOT_BLANK;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
@@ -14,43 +15,45 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import com.healthrib.enums.messages.ValidationMessagesType;
-import com.healthrib.validations.NotNull.List;
+import com.healthrib.annotations.NotBlank.List;
+import com.healthrib.enums.ValidationMessagesType;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 /**
- * The annotated element must not be {@code null}.
- * Accepts any type.
+ * The annotated element must not be {@code null} and must contain at least one
+ * non-whitespace character. Accepts {@code CharSequence}.
  *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  * @modified Lucas Ribeiro
+ * @since 2.0
+ *
+ * @see Character#isWhitespace(char)
  */
+@Documented
+@Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
-@Documented
-@Constraint(validatedBy = { })
-public @interface NotNull  {
+public @interface NotBlank {
 	
-	ValidationMessagesType message() default NOT_NULL;
+
+	ValidationMessagesType message() default NOT_BLANK;
 
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
 
 	/**
-	 * Defines several {@link NotNull} annotations on the same element.
+	 * Defines several {@code @NotBlank} constraints on the same element.
 	 *
-	 * @see jakarta.validation.constraints.NotNull
+	 * @see NotBlank
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 	@Retention(RUNTIME)
 	@Documented
-	@interface List {
-
-		NotNull[] value();
+	public @interface List {
+		NotBlank[] value();
 	}
-	
 }

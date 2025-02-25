@@ -1,6 +1,6 @@
-package com.healthrib.abstracts.validators;
+package com.healthrib.annotations.implementations;
 
-import com.healthrib.validations.NotNull;
+import com.healthrib.annotations.NotNull;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

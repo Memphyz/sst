@@ -1,8 +1,8 @@
-package com.healthrib.abstracts.validators;
+package com.healthrib.annotations.implementations;
 
 import static org.springframework.util.StringUtils.hasText;
 
-import com.healthrib.validations.NotBlank;
+import com.healthrib.annotations.NotBlank;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
