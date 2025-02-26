@@ -12,14 +12,15 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.healthrib.security.TokenFilter;
-import com.healthrib.security.TokenProvider;
+
+import com.healthrib.service.authorization.TokenProviderService;
 
 @Configuration
 @EnableWebSecurity
 public class CorsConfiguration {
 	
 	@Autowired
-	private TokenProvider provider;
+	private TokenProviderService provider;
 	
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -30,7 +31,7 @@ public class CorsConfiguration {
 				.cors(cors -> {})
 				.authorizeHttpRequests(cors -> cors
 						.requestMatchers("/authorization/**", "/swagger-ui.html**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-						.requestMatchers("/imup/**").permitAll()
+						.requestMatchers("/imup").permitAll()
 						.requestMatchers("/api/v1/**").authenticated()
 						.anyRequest().denyAll())
 				.sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

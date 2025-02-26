@@ -14,7 +14,7 @@
     </dependency>
     <dependency>
         <groupId>com.healthrib</groupId>
-        <artifactId>healthrib-authorization</artifactId>
+        <artifactId>healthrib-architecture</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>

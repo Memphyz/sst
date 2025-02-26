@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 public class Token implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	private String username;
-	private Boolean authenticated;
+	private String email;
 	private Date createdAt;
 	private Date expiration;
 	private String accessToken;

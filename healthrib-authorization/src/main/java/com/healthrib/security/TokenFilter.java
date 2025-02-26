@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.filter.GenericFilterBean;
 
+import com.healthrib.service.authorization.TokenProviderService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -19,7 +20,7 @@ import lombok.AllArgsConstructor;
 public class TokenFilter extends GenericFilterBean  {
 	
 	@Autowired
-	private TokenProvider provider;
+	private TokenProviderService provider;
 	
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

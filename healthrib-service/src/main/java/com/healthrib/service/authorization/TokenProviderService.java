@@ -1,4 +1,4 @@
-package com.healthrib.security;
+package com.healthrib.service.authorization;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC256;
 import static com.healthrib.enums.ValidationMessagesType.FORBIDDEN;
@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
@@ -23,13 +22,14 @@ import com.healthrib.enums.user.permission.UserPermissionType;
 import com.healthrib.exceptions.AuthenticationException;
 import com.healthrib.resources.Token;
 
+import com.healthrib.service.user.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 
 
 @Service
-public class TokenProvider {
+public class TokenProviderService {
 	
 	@Getter
 	@Value("${security.jwt.token.secret-key:default-key}")
@@ -39,7 +39,7 @@ public class TokenProvider {
 	private Long expire;
 	
 	@Autowired
-	private UserDetailsService service;
+	private UserService service;
 	
 	private static final String BEARER_NAME = "Bearer ";
 	private static final String AUTH = "Authorization";
@@ -52,12 +52,12 @@ public class TokenProvider {
 		algorithm = HMAC256(secret.getBytes());
 	}
 	
-	public Token createAccessToken(String username, List<UserPermissionType> roles) {
+	public Token createAccessToken(String email, List<UserPermissionType> roles) {
 		Date date = new Date();
 		Date validity = new Date(date.getTime() + expire);
-		String accessToken = getAccessToken(username, roles, date, validity);
-		String refreshToken = getRefreshToken(username, roles, date);
-		return new Token(username, true, date, validity, accessToken, refreshToken);
+		String accessToken = getAccessToken(email, roles, date, validity);
+		String refreshToken = getRefreshToken(email, roles, date);
+		return new Token(email, date, validity, accessToken, refreshToken);
 	}
 	
 	
@@ -67,24 +67,24 @@ public class TokenProvider {
 		return createAccessToken(decoded.getSubject(), decoded.getClaim("roles").asList(UserPermissionType.class));
 	}
 
-	private String getRefreshToken(String username, List<UserPermissionType> roles, Date date) {
+	private String getRefreshToken(String email, List<UserPermissionType> roles, Date date) {
 		Date validity = new Date(date.getTime() + (expire * 3));
 		return JWT.create()
 				.withClaim("roles", roles.stream().map(role -> role.getName()).toList())
 				.withIssuedAt(date)
 				.withExpiresAt(validity)
-				.withSubject(username)
+				.withSubject(email)
 				.sign(algorithm)
 				.strip();
 	}
 
-	private String getAccessToken(String username, List<UserPermissionType> roles, Date date, Date validity) {
+	private String getAccessToken(String email, List<UserPermissionType> roles, Date date, Date validity) {
 		String issueUrl = fromCurrentContextPath().build().toUriString();
 		return JWT.create()
 				.withClaim("roles", roles.stream().map(role -> role.getName()).toList())
 				.withIssuedAt(date)
 				.withExpiresAt(validity)
-				.withSubject(username)
+				.withSubject(email)
 				.withIssuer(issueUrl)
 				.sign(algorithm)
 				.strip();

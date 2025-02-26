@@ -15,18 +15,18 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
-import com.healthrib.security.TokenProvider;
+import com.healthrib.service.authorization.TokenProviderService;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration {
+public class SecurityConfiguration  {
 	
 	private static final int DEFAULT_SALT_LENGTH = 16;
 
 	private static final int DEFAULT_ITERATIONS = 310000;
 
 	@Autowired
-	private TokenProvider provider;
+	private TokenProviderService provider;
 
 	@Bean
 	PasswordEncoder encoder() {
@@ -42,5 +42,7 @@ public class SecurityConfiguration {
 	AuthenticationManager authenticationManagerBean(AuthenticationConfiguration configuration) throws Exception {
 		return configuration.getAuthenticationManager();
 	}
+	
+	
 
 }

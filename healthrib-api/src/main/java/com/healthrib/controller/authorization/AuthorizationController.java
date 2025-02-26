@@ -22,11 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.healthrib.model.user.User;
 import com.healthrib.resources.Credentials;
 import com.healthrib.resources.Token;
+import com.healthrib.service.authorization.AuthorizationService;
 
-import bom.healthrib.service.authorization.AuthorizationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("authorization")
 public class AuthorizationController {
@@ -36,6 +38,7 @@ public class AuthorizationController {
 	
 	@PostMapping("/signin")
 	public ResponseEntity<?> signIn(@RequestBody @NotNull @Valid Credentials credentials) {
+		log.info("POST | signIn | Sign in with credentials: {}", credentials.toString());
 		Token token = service.signIn(credentials);
 		if(token == null) {
 			return status(FORBIDDEN).body(INVALID_CREDENTIALS.getMessage());
@@ -45,6 +48,7 @@ public class AuthorizationController {
 	
 	@PutMapping("/refresh/{username}")
 	public ResponseEntity<?> refreshToken(@PathVariable @NotNull String username, @RequestHeader("Authorization") String bearer) {
+		log.info("PUT | refreshToken | Refreshing token from user: {}", username);
 		if(isNull(bearer) || !hasLength(bearer)) {
 			return status(FORBIDDEN).body(REFRESH_TOKEN_NOT_PROVIDED.getMessage());
 		}
@@ -56,7 +60,8 @@ public class AuthorizationController {
 	}
 	
 	@PostMapping("/signup")
-	public ResponseEntity<User> signUp(@RequestBody @NotNull @Valid User user) {
+	public ResponseEntity<User> signUp(@RequestBody @Valid User user) throws Exception {
+		log.info("POST | signUp | Signing up user: {}", user.getUsername());
 		return ok(service.signup(user));
 	}
 
