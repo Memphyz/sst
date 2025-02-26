@@ -3,7 +3,7 @@ spring:
     name: healthrib
   config:
     import:
-    - optional:configserver:http://localhost:8888/
+    - optional:configserver:https://literary-deana-memphyz-672fb30d.koyeb.app/
   cloud:
     config:
       profile: dev
