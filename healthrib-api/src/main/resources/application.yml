@@ -6,9 +6,10 @@ spring:
     - optional:configserver:https://literary-deana-memphyz-672fb30d.koyeb.app/
   cloud:
     config:
-      profile: dev
+      profile: ${spring.profiles.active}
   profiles:
     active:
     - dev
+    - prod
 server:
   port: 8080
