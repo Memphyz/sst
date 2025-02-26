@@ -78,5 +78,9 @@ public class AuthorizationService {
 		emailService.send(user.getName(), user.getEmail());
 		return saved;
 	}
+	
+	public boolean hasUserByEmail(String email) {
+		return repository.existsByEmail(email);
+	}
 
 }

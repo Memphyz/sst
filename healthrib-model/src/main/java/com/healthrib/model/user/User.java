@@ -3,7 +3,9 @@ package com.healthrib.model.user;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.healthrib.abstracts.model.auditable.AbstractModelAuditable;
@@ -41,7 +43,9 @@ public class User extends AbstractModelAuditable<String> implements UserDetails 
 
 	@Email
 	@NotNull
+	@MongoId
 	@Size(min = 5, max = 255)
+	@Indexed(unique=true)
 	private String email;
 	
 	@NotNull

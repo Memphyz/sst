@@ -4,12 +4,14 @@ import static com.healthrib.enums.ValidationMessagesType.INVALID_CREDENTIALS;
 import static com.healthrib.enums.ValidationMessagesType.INVALID_REFRESH_TOKEN;
 import static com.healthrib.enums.ValidationMessagesType.REFRESH_TOKEN_NOT_PROVIDED;
 import static java.util.Objects.isNull;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 import static org.springframework.util.StringUtils.hasLength;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,7 +62,10 @@ public class AuthorizationController {
 	}
 	
 	@PostMapping("/signup")
-	public ResponseEntity<User> signUp(@RequestBody @Valid User user) throws Exception {
+	public ResponseEntity<?> signUp(@RequestBody @Valid User user) throws Exception {
+		if(service.hasUserByEmail(user.getEmail())) {
+			return ResponseEntity.status(CONFLICT).build();
+		}
 		log.info("POST | signUp | Signing up user: {}", user.getUsername());
 		return ok(service.signup(user));
 	}
