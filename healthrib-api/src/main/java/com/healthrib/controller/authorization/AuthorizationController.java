@@ -11,7 +11,6 @@ import static org.springframework.http.ResponseEntity.status;
 import static org.springframework.util.StringUtils.hasLength;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,12 +61,17 @@ public class AuthorizationController {
 	}
 	
 	@PostMapping("/signup")
-	public ResponseEntity<?> signUp(@RequestBody @Valid User user) throws Exception {
+	public ResponseEntity<?> signUp(@RequestBody @Valid User user) {
 		if(service.hasUserByEmail(user.getEmail())) {
 			return ResponseEntity.status(CONFLICT).build();
 		}
 		log.info("POST | signUp | Signing up user: {}", user.getUsername());
 		return ok(service.signup(user));
+	}
+	
+	@PostMapping("/verify/{email}/{confirmationToken}")
+	public ResponseEntity<?> confirmEmail(@PathVariable String email, @PathVariable String confirmationToken) {
+		return service.confirmEmail(email, confirmationToken);
 	}
 
 }
