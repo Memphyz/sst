@@ -30,8 +30,13 @@ public class CorsConfiguration {
 				.addFilterBefore(new TokenFilter(provider), UsernamePasswordAuthenticationFilter.class)
 				.cors(cors -> {})
 				.authorizeHttpRequests(cors -> cors
-						.requestMatchers("/authorization/**", "/swagger-ui.html**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-						.requestMatchers("/imup").permitAll()
+						.requestMatchers(
+								"/authorization/**",
+								"/imup",
+								"/swagger-ui.html**",
+								"/swagger-ui/**",
+								"/v3/api-docs/**"
+								).permitAll()
 						.requestMatchers("/api/v1/**").authenticated()
 						.anyRequest().denyAll())
 				.sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
