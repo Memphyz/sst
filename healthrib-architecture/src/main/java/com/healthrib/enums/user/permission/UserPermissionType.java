@@ -10,6 +10,7 @@ import lombok.Getter;
 public enum UserPermissionType implements GrantedAuthority {
 	
 	ADMIN("ADMIN"),
+	TEST("TEST"),
 	MANAGER("MANAGER"),
 	COWORKER("COWORKER"),
 	AUDITOR("AUDITOR"),

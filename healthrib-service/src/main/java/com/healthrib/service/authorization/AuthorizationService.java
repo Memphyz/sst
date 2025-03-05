@@ -90,8 +90,12 @@ public class AuthorizationService {
 	}
 
 	@Transactional
-	public User signup(User user) {
+	public User signup(Credentials credential) {
 		String encoderName = "{pbkdf2}";
+		User user = new User();
+		user.setName(credential.getName());
+		user.setEmail(credential.getEmail());
+		user.setRoles(credential.getRoles());
 		user.setPassword(encoder.encode(user.getPassword()).substring(encoderName.length()));
 		user.setCreatedAt(now());
 		user.setStatus(ACTIVE);

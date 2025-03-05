@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.healthrib.model.user.User;
 import com.healthrib.resources.Credentials;
 import com.healthrib.resources.Token;
 import com.healthrib.service.authorization.AuthorizationService;
@@ -68,12 +67,12 @@ public class AuthorizationController {
 		
 	@Operation(description = "Used to create a new user. After user crestion a confirmation email will be sent to a email provided.")
 	@PostMapping("/signup")
-	public ResponseEntity<?> signUp(@RequestBody @Valid @Parameter(description = "A user data to be created on database") User user) {
-		if(service.hasUserByEmail(user.getEmail())) {
+	public ResponseEntity<?> signUp(@RequestBody @Valid @Parameter(description = "A user data to be created on database") Credentials credential) {
+		if(service.hasUserByEmail(credential.getEmail())) {
 			return ResponseEntity.status(CONFLICT).build();
 		}
-		log.info("POST | signUp | Signing up user: {}", user.getUsername());
-		return ok(service.signup(user));
+		log.info("POST | signUp | Signing up user: {}", credential.getName());
+		return ok(service.signup(credential));
 	}
 	
 	@Operation(description = "Used to confirm a email provided by user on his creation, for param we recive a email provided and a token that user recived on email link.")

@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class EmailService {
 	
-	@Value("${server.url}")
+	@Value("${server.url:http://localhost:8080}")
 	private String url;
 
 	@Autowired
