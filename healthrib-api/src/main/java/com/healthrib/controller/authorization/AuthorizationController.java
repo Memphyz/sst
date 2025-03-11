@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.healthrib.resources.Credentials;
+import com.healthrib.resources.Login;
 import com.healthrib.resources.Token;
 import com.healthrib.service.authorization.AuthorizationService;
 
@@ -33,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@Tag(description = "login, signup, refresh token, email confirmation, etc.", name = "Authorization")
+@Tag(description = "login, signup, refresh token, email confirmation, etc...", name = "Authorization")
 @RequestMapping("authorization")
 public class AuthorizationController {
 	
@@ -42,9 +43,9 @@ public class AuthorizationController {
 	
 	@Operation(description = "Used to sign in a user by email and password as credentials.")
 	@PostMapping("/signin")
-	public ResponseEntity<?> signIn(@RequestBody @NotNull @Valid @Parameter(description = "Credentials used to sign in by email and password") Credentials credentials) {
-		log.info("POST | signIn | Sign in with credentials: {}", credentials.toString());
-		Token token = service.signIn(credentials);
+	public ResponseEntity<?> signIn(@RequestBody @NotNull @Valid @Parameter(description = "Login credentials used to sign in by email and password") Login login) {
+		log.info("POST | signIn | Sign in with credentials: {}", login.toString());
+		Token token = service.signIn(login);
 		if(token == null) {
 			return status(FORBIDDEN).body(INVALID_CREDENTIALS.getMessage());
 		}
@@ -67,12 +68,13 @@ public class AuthorizationController {
 		
 	@Operation(description = "Used to create a new user. After user crestion a confirmation email will be sent to a email provided.")
 	@PostMapping("/signup")
-	public ResponseEntity<?> signUp(@RequestBody @Valid @Parameter(description = "A user data to be created on database") Credentials credential) {
-		if(service.hasUserByEmail(credential.getEmail())) {
+	public ResponseEntity<?> signUp(@RequestBody @Valid @Parameter(description = "A user data to be created on database") Credentials credentials) {
+		log.info("POST | signUp | Sign up with credentials: {}", credentials.toString());
+		if(service.hasUserByEmail(credentials.getEmail())) {
 			return ResponseEntity.status(CONFLICT).build();
 		}
-		log.info("POST | signUp | Signing up user: {}", credential.getName());
-		return ok(service.signup(credential));
+		log.info("POST | signUp | Signing up user: {}", credentials.getName());
+		return ok(service.signup(credentials));
 	}
 	
 	@Operation(description = "Used to confirm a email provided by user on his creation, for param we recive a email provided and a token that user recived on email link.")

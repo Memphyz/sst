@@ -29,4 +29,8 @@ public class UserService implements UserDetailsService {
 		return user;
 	}
 	
+	public void deleteByEmail(String email) {
+		repository.deleteById(email);
+	}
+	
 }

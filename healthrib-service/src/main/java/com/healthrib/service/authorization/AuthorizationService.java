@@ -25,6 +25,7 @@ import com.healthrib.model.user.User;
 import com.healthrib.repository.user.ConfirmationTokenRepository;
 import com.healthrib.repository.user.UserRepository;
 import com.healthrib.resources.Credentials;
+import com.healthrib.resources.Login;
 import com.healthrib.resources.Token;
 import com.healthrib.service.email.EmailService;
 
@@ -69,13 +70,13 @@ public class AuthorizationService {
 		return ResponseEntity.status(NOT_FOUND).body(USER_VERIFIED);
 	}
 
-	public Token signIn(Credentials credentials) {
-		String email = credentials.getEmail();
+	public Token signIn(Login login) {
+		String email = login.getEmail();
 		User user = repository.findByEmail(email);
 		if (user == null) {
 			throw new UsernameNotFoundException(USER_NOT_FOUND);
 		}
-		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, credentials.getPassword()));
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, login.getPassword()));
 		Token response = provider.createAccessToken(email, user.getRoles());
 		repository.save(user);
 		return response;
@@ -96,7 +97,7 @@ public class AuthorizationService {
 		user.setName(credential.getName());
 		user.setEmail(credential.getEmail());
 		user.setRoles(credential.getRoles());
-		user.setPassword(encoder.encode(user.getPassword()).substring(encoderName.length()));
+		user.setPassword(encoder.encode(credential.getPassword()).substring(encoderName.length()));
 		user.setCreatedAt(now());
 		user.setStatus(ACTIVE);
 		user.setVerified(false);
