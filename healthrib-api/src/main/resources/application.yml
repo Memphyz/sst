@@ -1,6 +1,6 @@
 spring:
   application:
-    name: healthrib
+    name: sst
   main:
     allow-circular-references: true
   config:

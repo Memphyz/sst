@@ -2,20 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.healthrib</groupId>
-	<artifactId>healthrib</artifactId>
+	<groupId>com.sst</groupId>
+	<artifactId>sst</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>healthrib</name>
+	<name>sst</name>
 	<description>Um backend para um projeto de Gestão de Saúde e Segurança do Trabalho</description>
 	<packaging>pom</packaging>
 	<modules>
-	   <module>healthrib-model</module>
-	   <module>healthrib-repository</module>
-	   <module>healthrib-service</module>
-	   <module>healthrib-api</module>
-	   <module>healthrib-assembler</module>
-	   <module>healthrib-authorization</module>
-	   <module>healthrib-architecture</module>
+	   <module>sst-model</module>
+	   <module>sst-repository</module>
+	   <module>sst-service</module>
+	   <module>sst-api</module>
+	   <module>sst-assembler</module>
+	   <module>sst-authorization</module>
+	   <module>sst-architecture</module>
 	</modules>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -133,7 +133,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-				    <mainClass>com.healthrib.HealthRibInitializer</mainClass>
+				    <mainClass>com.sst.HealthRibInitializer</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
