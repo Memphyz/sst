@@ -5,6 +5,7 @@ import static com.sst.enums.ValidationMessagesType.INVALID_REFRESH_TOKEN;
 import static com.sst.enums.ValidationMessagesType.REFRESH_TOKEN_NOT_PROVIDED;
 import static java.util.Objects.isNull;
 import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sst.model.user.User;
 import com.sst.resources.Credentials;
 import com.sst.resources.Login;
 import com.sst.resources.Token;
@@ -69,12 +71,12 @@ public class AuthorizationController {
 	@Operation(description = "Used to create a new user. After user crestion a confirmation email will be sent to a email provided.")
 	@PostMapping("/signup")
 	public ResponseEntity<?> signUp(@RequestBody @Valid @Parameter(description = "A user data to be created on database") Credentials credentials) {
-		log.info("POST | signUp | Sign up with credentials: {}", credentials.toString());
+		log.info("POST | signUp | Sign 	 with credentials: {}", credentials.toString());
 		if(service.hasUserByEmail(credentials.getEmail())) {
 			return ResponseEntity.status(CONFLICT).build();
 		}
 		log.info("POST | signUp | Signing up user: {}", credentials.getName());
-		return ok(service.signup(credentials));
+		return new ResponseEntity<User>(service.signup(credentials), CREATED);
 	}
 	
 	@Operation(description = "Used to confirm a email provided by user on his creation, for param we recive a email provided and a token that user recived on email link.")

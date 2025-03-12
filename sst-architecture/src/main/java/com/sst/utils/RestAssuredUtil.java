@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
 import io.restassured.RestAssured;
+import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -23,6 +24,10 @@ public class RestAssuredUtil {
 
 	@Autowired
 	private static Environment environment;
+	
+	static {
+		RestAssured.defaultParser = Parser.JSON;
+	}
 
 	private static Integer getPort() {
 		if (environment == null) {
@@ -118,8 +123,8 @@ public class RestAssuredUtil {
 	 * @param body of request
 	 * @return
 	 */
-	public static final RequestSpecification post(String url, Object body) {
-		return given().basePath(url).port(getPort()).contentType(JSON).body(body);
+	public static final Response post(String url, Object body) {
+		return given().basePath(url).port(getPort()).contentType(JSON).body(body).post();
 	}
 
 	/**

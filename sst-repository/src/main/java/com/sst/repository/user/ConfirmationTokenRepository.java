@@ -7,4 +7,5 @@ import com.sst.model.user.ConfirmationToken;
 public interface ConfirmationTokenRepository extends MongoRepository<ConfirmationToken, String> {
 	ConfirmationToken findByConfirmationToken(String confirmationToken);
 	ConfirmationToken deleteByConfirmationToken(String confirmationToken);
+	ConfirmationToken findByUserEmail(String email);
 }

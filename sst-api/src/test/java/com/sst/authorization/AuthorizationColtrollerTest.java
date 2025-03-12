@@ -1,14 +1,18 @@
 package com.sst.authorization;
 
+import static com.sst.enums.ValidationMessagesType.USER_VERIFIED;
 import static com.sst.enums.user.permission.UserPermissionType.TEST;
 import static com.sst.utils.RestAssuredUtil.delete;
 import static com.sst.utils.RestAssuredUtil.get;
 import static com.sst.utils.RestAssuredUtil.post;
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 import java.util.HashMap;
@@ -20,15 +24,17 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.env.Environment;
 
 import com.sst.TestConfig;
+import com.sst.model.user.ConfirmationToken;
+import com.sst.model.user.User;
 import com.sst.resources.Credentials;
 import com.sst.resources.Login;
 import com.sst.resources.Token;
+import com.sst.service.authorization.AuthorizationService;
 
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -38,19 +44,21 @@ import lombok.extern.slf4j.Slf4j;
 @TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest(classes = TestConfig.class)
 public class AuthorizationColtrollerTest {
-	
+
 	private static final Credentials credentials = new Credentials();
 	private static final Map<String, String> authHeader = new HashMap<>();
-	
-	@Autowired
-	Environment environment;
-	
+	private Token token;
+	private User user;
+
+	@InjectMocks
+	private AuthorizationService service;
+
 	@Value("${account-test.admin.email}")
 	private String adminEmail;
-	
+
 	@Value("${account-test.admin.password}")
 	private String adminPassword;
-	
+
 	@BeforeAll
 	public void prepare_tests() {
 		log.info("AuthorizationColtrollerTest | prepare_tests | Criando usuário com dados mockados para testes");
@@ -59,25 +67,27 @@ public class AuthorizationColtrollerTest {
 		credentials.setEmail("junit@sstbeforeallsignup.com");
 		credentials.setRoles(asList(TEST));
 		log.info("AuthorizationColtrollerTest | prepare_tests | Obtendo token de ADMINISTRADOR para realizar alterações no banco");
-		Token token = post("/authorization/signin", new Login(adminEmail, adminPassword) ,Token.class);
+		Token token = post("/authorization/signin", new Login(adminEmail, adminPassword), Token.class);
 		authHeader.put("Authorization", "Bearer " + token.getAccessToken());
 		assertNotNull(token);
 		assertNotNull(token.getAccessToken());
 		log.info("AuthorizationColtrollerTest | prepare_tests | Token obtido com sucesso!");
 		log.info("AuthorizationColtrollerTest | prepare_tests | Verificando se o usuário de testes existe");
 		Response response = get("/api/v1/user/email/" + credentials.getEmail(), authHeader);
-		if(response.getStatusCode() == FORBIDDEN.value()) {
-			log.info("AuthorizationColtrollerTest | prepare_tests | Usuário {} não existe na base de dados, tudo certo.", credentials.getEmail());
+		if (response.getStatusCode() == FORBIDDEN.value()) {
+			log.info("AuthorizationColtrollerTest | prepare_tests | Usuário {} não existe na base de dados, tudo certo.",
+					credentials.getEmail());
 			return;
 		}
-		log.info("AuthorizationColtrollerTest | prepare_tests | Usuário {} existe na base de dados, realizando limpeza.", credentials.getEmail());
+		log.info("AuthorizationColtrollerTest | prepare_tests | Usuário {} existe na base de dados, realizando limpeza.",
+				credentials.getEmail());
 		delete("/api/v1/user/email/" + credentials.getEmail(), authHeader);
 		log.info("AuthorizationColtrollerTest | prepare_tests | Limpeza concluída");
-		
+
 	}
-	
+
 	@Test
-	@Order(0)
+	@Order(1)
 	public void should_verify_credentials_data_not_null() {
 		log.info("AuthorizationColtrollerTest | should_verify_credentials_data_not_null | Verificando se as variáveis cruciais para os testes não estão nulas");
 		assertNotNull(credentials.getName());
@@ -85,9 +95,9 @@ public class AuthorizationColtrollerTest {
 		assertNotNull(credentials.getEmail());
 		assertNotNull(credentials.getRoles());
 	}
-	
+
 	@Test
-	@Order(1)
+	@Order(2)
 	public void should_verify_credentials_data_mock() {
 		log.info("AuthorizationColtrollerTest | should_verify_credentials_data_mock | Verifica se os dados do mock estão corretos");
 		assertEquals(credentials.getName(), "JUnit");
@@ -95,12 +105,65 @@ public class AuthorizationColtrollerTest {
 		assertEquals(credentials.getEmail(), "junit@sstbeforeallsignup.com");
 		assertEquals(credentials.getRoles(), asList(TEST));
 	}
-	
+
 	@Test
-	@Order(2)
-	public void should_delete_test_user_if_he_exists() {
-		
+	@Order(3)
+	public void create_test_user() {
+		log.info("AuthorizationColtrollerTest | create_test_user | Criando usuario para realizar testes");
+		Response response = post("/authorization/signup", credentials);
+		assertEquals(response.getStatusCode(), CREATED.value());
+	}
+
+	@Test
+	@Order(4)
+	public void sign_in_test_user() {
+		log.info("AuthorizationColtrollerTest | sign_in_test_user | Realiza login do usuário recem criado");
+		token = post("/authorization/signin", new Login(credentials.getEmail(), credentials.getPassword()),
+				Token.class);
+		authHeader.clear();
+		authHeader.put("Authorization", token.getAccessToken());
+		assertInstanceOf(Token.class, token);
 	}
 	
+	@Test
+	@Order(5)
+	public void should_check_signedin_token() {
+		log.info("AuthorizationColtrollerTest | should_check_signedin_token | Verifica token do usuário {}", credentials.getEmail());
+		assertNotNull(token.getAccessToken());
+		assertNotNull(token.getRefreshToken());
+		assertEquals(token.getEmail(), credentials.getEmail());
+		assertNotNull(token.getExpiration());
+	}
 
+	@Test
+	@Order(6)
+	public void should_find_test_user() {
+		log.info("AuthorizationColtrollerTest | should_find_test_user | Busca o usuário de teste recém criado");
+		var test = get("/api/v1/user/email/" + credentials.getEmail(), Object.class);
+		assertInstanceOf(User.class, token);
+	}
+
+	@Test
+	@Order(7)
+	public void assert_test_user_not_verified() {
+		log.info("AuthorizationColtrollerTest | assert_test_user_not_verified | Checando se o email do usuário não está verificado");
+		assertFalse(user.isVerified());
+	}
+
+	@Test
+	@Order(8)
+	public void verify_test_user() {
+		log.info("AuthorizationColtrollerTest | verify_test_user | Realiza a verificação de email do usuário recém criado");
+		ConfirmationToken token = service.findConfirmationTokenByEmail(user.getEmail());
+		String response = post("/authorization/verify/" + user.getEmail() + "/" + token.getConfirmationToken(),
+				String.class);
+		assertEquals(response, USER_VERIFIED);
+	}
+
+	@Test
+	@Order(9)
+	public void assert_test_user_verified() {
+		log.info("AuthorizationColtrollerTest | assert_test_user_verified | Checando se o email do usuário está verificado");
+		assertTrue(user.isVerified());
+	}
 }

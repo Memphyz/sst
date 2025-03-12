@@ -7,6 +7,7 @@ import static com.sst.enums.user.permission.UserPermissionType.COWORKER;
 import static com.sst.type.status.StatusType.ACTIVE;
 import static java.time.LocalDateTime.now;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.Arrays;
@@ -67,7 +68,7 @@ public class AuthorizationService {
 		repository.save(user);
 		log.info("confirmEmail | User email {} verified successfully", confirmation.getUser().getEmail());
 		confirmationRepository.deleteByConfirmationToken(token);
-		return ResponseEntity.status(NOT_FOUND).body(USER_VERIFIED);
+		return ResponseEntity.status(OK).body(USER_VERIFIED);
 	}
 
 	public Token signIn(Login login) {
@@ -119,6 +120,10 @@ public class AuthorizationService {
 			}
 		}).start();
 		return saved;
+	}
+	
+	public ConfirmationToken findConfirmationTokenByEmail(String email) {
+		return confirmationRepository.findByUserEmail(email);
 	}
 
 	public boolean hasUserByEmail(String email) {
