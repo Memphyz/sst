@@ -35,7 +35,8 @@ public class CorsConfiguration {
 								"/imup",
 								"/swagger-ui.html**",
 								"/swagger-ui/**",
-								"/v3/api-docs/**"
+								"/v3/api-docs/**",
+								"/actuator"
 								).permitAll()
 						.requestMatchers("/api/v1/**").authenticated()
 						.anyRequest().denyAll())
