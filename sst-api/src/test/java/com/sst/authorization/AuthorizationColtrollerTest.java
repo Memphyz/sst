@@ -3,10 +3,13 @@ package com.sst.authorization;
 import static com.sst.enums.user.permission.UserPermissionType.TEST;
 import static com.sst.utils.RestAssuredUtil.delete;
 import static com.sst.utils.RestAssuredUtil.get;
+import static com.sst.utils.RestAssuredUtil.post;
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,18 +26,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 
 import com.sst.TestConfig;
-import com.sst.model.user.User;
 import com.sst.resources.Credentials;
 import com.sst.resources.Login;
 import com.sst.resources.Token;
-import com.sst.utils.RestAssuredUtil;
 
+import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@SpringBootTest(classes = TestConfig.class)
-@TestMethodOrder(OrderAnnotation.class)
 @TestInstance(PER_CLASS)
+@TestMethodOrder(OrderAnnotation.class)
+@SpringBootTest(classes = TestConfig.class)
 public class AuthorizationColtrollerTest {
 	
 	private static final Credentials credentials = new Credentials();
@@ -43,10 +45,10 @@ public class AuthorizationColtrollerTest {
 	@Autowired
 	Environment environment;
 	
-	@Value("${security.admin.email}")
+	@Value("${account-test.admin.email}")
 	private String adminEmail;
 	
-	@Value("${security.admin.password}")
+	@Value("${account-test.admin.password}")
 	private String adminPassword;
 	
 	@BeforeAll
@@ -57,18 +59,19 @@ public class AuthorizationColtrollerTest {
 		credentials.setEmail("junit@sstbeforeallsignup.com");
 		credentials.setRoles(asList(TEST));
 		log.info("AuthorizationColtrollerTest | prepare_tests | Obtendo token de ADMINISTRADOR para realizar alterações no banco");
-		Token token = RestAssuredUtil.post("/authorization/signin", new Login(adminEmail, adminPassword) ,Token.class);
+		Token token = post("/authorization/signin", new Login(adminEmail, adminPassword) ,Token.class);
+		authHeader.put("Authorization", "Bearer " + token.getAccessToken());
 		assertNotNull(token);
 		assertNotNull(token.getAccessToken());
-		authHeader.put("Authorization", "Bearer " + token.getAccessToken());
 		log.info("AuthorizationColtrollerTest | prepare_tests | Token obtido com sucesso!");
 		log.info("AuthorizationColtrollerTest | prepare_tests | Verificando se o usuário de testes existe");
-		User user = get("/api/v1//user/email/" + credentials.getEmail(), User.class, authHeader);
-		if(user == null) {
+		Response response = get("/api/v1/user/email/" + credentials.getEmail(), authHeader);
+		if(response.getStatusCode() == FORBIDDEN.value()) {
 			log.info("AuthorizationColtrollerTest | prepare_tests | Usuário {} não existe na base de dados, tudo certo.", credentials.getEmail());
+			return;
 		}
 		log.info("AuthorizationColtrollerTest | prepare_tests | Usuário {} existe na base de dados, realizando limpeza.", credentials.getEmail());
-		delete("/api/v1//user/email/" + credentials.getEmail(), authHeader);
+		delete("/api/v1/user/email/" + credentials.getEmail(), authHeader);
 		log.info("AuthorizationColtrollerTest | prepare_tests | Limpeza concluída");
 		
 	}

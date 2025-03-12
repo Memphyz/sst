@@ -1,0 +1,7 @@
+spring:
+  config:
+    import:
+    - configserver:https://server-config.koyeb.app/
+  cloud:
+      config:
+        uri: https://server-config.koyeb.app/
