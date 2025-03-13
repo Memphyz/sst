@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.sst.abstracts.model.AbstractModel;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -34,12 +35,17 @@ public class ConfirmationToken extends AbstractModel<String> {
 	    
 	    @CreatedDate
 	    private Date createdDate;
+	    
+	    @NotNull
+	    @Email
+	    private String email;
 
 	    @DBRef
 	    private User user;
 	    
 	    public ConfirmationToken(User user) {
 	        this.user = user;
+	        this.email = user.getEmail();
 	        createdDate = new Date();
 	        confirmationToken = randomUUID().toString();
 	    }

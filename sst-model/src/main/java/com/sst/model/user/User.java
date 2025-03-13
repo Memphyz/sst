@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sst.abstracts.model.auditable.AbstractModelAuditable;
 import com.sst.enums.user.permission.UserPermissionType;
 import com.sst.type.status.StatusType;
@@ -62,11 +63,23 @@ public class User extends AbstractModelAuditable<String> implements UserDetails 
 	@Valid
 	@SchemaProperty(name = "User status (ACTIVE or INACTIVE)")
 	private StatusType status;
-
+	
 	@NotNull
 	@Valid
 	@SchemaProperty(name = "User roles access")
 	private List<UserPermissionType> roles;
+	
+	@JsonIgnore
+	private Boolean accountNonExpired;
+
+	@JsonIgnore
+	private Boolean accountNonLocked;
+
+	@JsonIgnore
+	private Boolean credentialsNonExpired;
+
+	@JsonIgnore
+	private Boolean enabled;
 
 	@Override
 	public Collection<UserPermissionType> getAuthorities() {
@@ -74,6 +87,7 @@ public class User extends AbstractModelAuditable<String> implements UserDetails 
 	}
 
 	@Override
+	@JsonIgnore
 	public String getUsername() {
 		return this.getEmail();
 	}

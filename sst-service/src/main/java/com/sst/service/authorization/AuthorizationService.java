@@ -103,11 +103,14 @@ public class AuthorizationService {
 		user.setStatus(ACTIVE);
 		user.setVerified(false);
 		user.setCreatedBy("client");
-		ConfirmationToken confirmation = new ConfirmationToken(user);
-		confirmationRepository.save(confirmation);
 		if (isEmpty(user.getRoles())) {
 			user.setRoles(Arrays.asList(COWORKER));
 		}
+		if(confirmationRepository.existsByEmail(user.getEmail())) {
+			confirmationRepository.deleteByEmail(user.getEmail());
+		}
+		ConfirmationToken confirmation = new ConfirmationToken(user);
+		confirmationRepository.save(confirmation);
 		User saved = repository.save(user);
 		log.info("POST | signup | User created successfully");
 		new Thread(() -> {
@@ -123,7 +126,7 @@ public class AuthorizationService {
 	}
 	
 	public ConfirmationToken findConfirmationTokenByEmail(String email) {
-		return confirmationRepository.findByUserEmail(email);
+		return confirmationRepository.findByEmail(email);
 	}
 
 	public boolean hasUserByEmail(String email) {

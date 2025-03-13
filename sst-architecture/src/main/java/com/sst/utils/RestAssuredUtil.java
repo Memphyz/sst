@@ -137,7 +137,7 @@ public class RestAssuredUtil {
 	 */
 	public static final <T> T get(String url, Class<T> extractAs) {
 		return given().basePath(url).port(getPort()).contentType(JSON).when().get().then()
-				.extract().body().as(extractAs);
+				.log().all().extract().body().as(extractAs);
 	}
 
 	/**

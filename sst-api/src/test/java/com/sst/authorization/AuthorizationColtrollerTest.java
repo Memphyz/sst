@@ -24,25 +24,26 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.mockito.InjectMocks;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.sst.TestConfig;
+import com.sst.enums.ValidationMessagesType;
 import com.sst.model.user.ConfirmationToken;
 import com.sst.model.user.User;
+import com.sst.repository.user.ConfirmationTokenRepository;
 import com.sst.resources.Credentials;
 import com.sst.resources.Login;
 import com.sst.resources.Token;
-import com.sst.service.authorization.AuthorizationService;
 
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@SpringBootTest(classes = TestConfig.class)
 @TestInstance(PER_CLASS)
 @TestMethodOrder(OrderAnnotation.class)
-@SpringBootTest(classes = TestConfig.class)
 public class AuthorizationColtrollerTest {
 
 	private static final Credentials credentials = new Credentials();
@@ -50,8 +51,8 @@ public class AuthorizationColtrollerTest {
 	private Token token;
 	private User user;
 
-	@InjectMocks
-	private AuthorizationService service;
+	@Autowired
+	private ConfirmationTokenRepository repository;
 
 	@Value("${account-test.admin.email}")
 	private String adminEmail;
@@ -139,8 +140,9 @@ public class AuthorizationColtrollerTest {
 	@Order(6)
 	public void should_find_test_user() {
 		log.info("AuthorizationColtrollerTest | should_find_test_user | Busca o usuário de teste recém criado");
-		var test = get("/api/v1/user/email/" + credentials.getEmail(), Object.class);
-		assertInstanceOf(User.class, token);
+		user = get("/api/v1/user/email/" + credentials.getEmail(), User.class, authHeader);
+		assertInstanceOf(User.class, user);
+		assertEquals(user.getEmail(), credentials.getEmail());
 	}
 
 	@Test
@@ -152,11 +154,12 @@ public class AuthorizationColtrollerTest {
 
 	@Test
 	@Order(8)
-	public void verify_test_user() {
+	public void verify_email_confirmation_test_user() {
 		log.info("AuthorizationColtrollerTest | verify_test_user | Realiza a verificação de email do usuário recém criado");
-		ConfirmationToken token = service.findConfirmationTokenByEmail(user.getEmail());
-		String response = post("/authorization/verify/" + user.getEmail() + "/" + token.getConfirmationToken(),
-				String.class);
+		ConfirmationToken token = repository.findByEmail(user.getEmail());
+		ValidationMessagesType response = post("/authorization/verify/" + user.getEmail() + "/" + token.getConfirmationToken(),
+				ValidationMessagesType.class);
+		user = get("/api/v1/user/email/" + credentials.getEmail(), User.class, authHeader);
 		assertEquals(response, USER_VERIFIED);
 	}
 

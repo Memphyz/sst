@@ -5,3 +5,4 @@ spring:
   cloud:
       config:
         uri: https://server-config.koyeb.app/
+        profile: local
