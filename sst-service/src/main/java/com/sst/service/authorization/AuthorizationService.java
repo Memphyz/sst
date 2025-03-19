@@ -20,13 +20,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sst.exceptions.PasswordMatchingException;
+import com.sst.exceptions.UserNotFound;
 import com.sst.exceptions.UsernameNotFoundException;
 import com.sst.model.user.ConfirmationToken;
+import com.sst.model.user.RecoveryPassword;
 import com.sst.model.user.User;
 import com.sst.repository.user.ConfirmationTokenRepository;
+import com.sst.repository.user.RecoveryPasswordRepository;
 import com.sst.repository.user.UserRepository;
 import com.sst.resources.Credentials;
 import com.sst.resources.Login;
+import com.sst.resources.ResetPassword;
 import com.sst.resources.Token;
 import com.sst.service.email.EmailService;
 
@@ -50,9 +55,14 @@ public class AuthorizationService {
 
 	@Autowired
 	private ConfirmationTokenRepository confirmationRepository;
+	
+	@Autowired
+	private RecoveryPasswordRepository recoveryRepository;
 
 	@Autowired
 	private EmailService emailService;
+	
+	private static final String encoderName = "{pbkdf2}";
 
 	public ResponseEntity<?> confirmEmail(String email, String token) {
 		User user = repository.findByEmail(email);
@@ -93,7 +103,6 @@ public class AuthorizationService {
 
 	@Transactional
 	public User signup(Credentials credential) {
-		String encoderName = "{pbkdf2}";
 		User user = new User();
 		user.setName(credential.getName());
 		user.setEmail(credential.getEmail());
@@ -115,7 +124,7 @@ public class AuthorizationService {
 		log.info("POST | signup | User created successfully");
 		new Thread(() -> {
 			try {
-				emailService.send(user.getName(), user.getEmail(), confirmation.getConfirmationToken());
+				emailService.send(user.getName(), user.getEmail(), "email.html", "/authorization/verify/" + user.getEmail() + "/" + confirmation.getConfirmationToken());
 				log.info("POST | signup | E-mail confirmation was sended successfully!");
 			} catch (Exception e) {
 				log.error("An error occurred on email send:");
@@ -128,9 +137,43 @@ public class AuthorizationService {
 	public ConfirmationToken findConfirmationTokenByEmail(String email) {
 		return confirmationRepository.findByEmail(email);
 	}
+	
+	public void sendRecoverPasswordToken(String email) {
+		User user = repository.findByEmail(email);
+		if(user == null) {
+			throw new UserNotFound();
+		}
+		if(recoveryRepository.existsByEmail(user.getEmail())) {
+			recoveryRepository.deleteByEmail(user.getEmail());
+		}
+		RecoveryPassword recovery = new RecoveryPassword(user);
+		recoveryRepository.save(recovery);
+		new Thread(() -> {
+			try {
+				emailService.send(user.getName(), user.getEmail(), "recovery.html", "/authorization/recovery/" + user.getEmail() + "/" + recovery.getToken());
+				log.info("POST | signup | E-mail recovery was sended successfully!");
+			} catch (Exception e) {
+				log.error("An error occurred on email send:");
+				e.printStackTrace();
+			}
+		}).start();
+	}
 
 	public boolean hasUserByEmail(String email) {
 		return repository.existsByEmail(email);
+	}
+	
+	public void resetPassword(ResetPassword body) {
+		User user = repository.findByEmail(body.getEmail());
+		if(user == null) {
+			throw new UserNotFound();
+		}
+		if(body.getPassword().equals(body.getConfirmPassword())) {
+			user.setPassword(encoder.encode(body.getPassword()).substring(encoderName.length()));
+			repository.save(user);
+			return;
+		}
+		throw new PasswordMatchingException();
 	}
 
 }
