@@ -47,6 +47,31 @@ public class RestAssuredUtil {
 		return given().basePath(url).port(getPort()).contentType(JSON).when().post().then()
 				.extract().body().as(extractAs);
 	}
+	
+	/**
+	 * Executes a post request to a API itself by URL and object of return of it
+	 * 
+	 * @author Lucas Ribeiro
+	 * @param url       of request
+	 * @param extractAs object extracted by body
+	 * @param headers headers of request
+	 */
+	public static final <T> T post(String url, Class<T> extractAs, Map<String, String> headers) {
+		return given().basePath(url).port(getPort()).contentType(JSON).when().post().then()
+				.extract().body().as(extractAs);
+	}
+	
+	/**
+	 * Executes a post request to a API itself by URL and object of return of it
+	 * 
+	 * @author Lucas Ribeiro
+	 * @param url       of request
+	 * @param body object body
+	 * @param headers headers of request
+	 */
+	public static final <T> Response post(String url, T body, Map<String, String> headers) {
+		return given().basePath(url).port(getPort()).body(body).contentType(JSON).when().post();
+	}
 
 	/**
 	 * Executes a post request to a API itself by URL, body and object of return of
@@ -58,6 +83,21 @@ public class RestAssuredUtil {
 	 * @param extractAs object extracted by body
 	 */
 	public static final <T, Body extends Object> T post(String url, Body body, Class<T> extractAs) {
+		return given().basePath(url).port(getPort()).body(body).contentType(JSON).when().post().then()
+				.extract().body().as(extractAs);
+	}
+	
+	/**
+	 * Executes a post request to a API itself by URL, body and object of return of
+	 * it
+	 * 
+	 * @author Lucas Ribeiro
+	 * @param url       of request
+	 * @param body      of request
+	 * @param extractAs object extracted by body
+	 * @param extractAs object extracted by body
+	 */
+	public static final <T, Body extends Object> T post(String url, Body body, Class<T> extractAs, Map<String, String> headers) {
 		return given().basePath(url).port(getPort()).body(body).contentType(JSON).when().post().then()
 				.extract().body().as(extractAs);
 	}
@@ -116,7 +156,7 @@ public class RestAssuredUtil {
 
 	/**
 	 * Executes a POST request to a API by URL and Body returning
-	 * {@link RequestSpecification}.
+	 * {@link Response}.
 	 * 
 	 * @author Lucas Ribeiro
 	 * @param url  of request

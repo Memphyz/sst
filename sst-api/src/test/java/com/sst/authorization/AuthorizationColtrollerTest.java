@@ -14,10 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -31,10 +33,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.sst.TestConfig;
 import com.sst.enums.ValidationMessagesType;
 import com.sst.model.user.ConfirmationToken;
+import com.sst.model.user.RecoveryPassword;
 import com.sst.model.user.User;
 import com.sst.repository.user.ConfirmationTokenRepository;
+import com.sst.repository.user.RecoveryPasswordRepository;
 import com.sst.resources.Credentials;
 import com.sst.resources.Login;
+import com.sst.resources.ResetPassword;
 import com.sst.resources.Token;
 
 import io.restassured.response.Response;
@@ -53,12 +58,18 @@ public class AuthorizationColtrollerTest {
 
 	@Autowired
 	private ConfirmationTokenRepository repository;
+	
+	@Autowired
+	private RecoveryPasswordRepository recoveryRepository;
 
 	@Value("${account-test.admin.email}")
 	private String adminEmail;
 
 	@Value("${account-test.admin.password}")
 	private String adminPassword;
+	
+	@Value("${account-test.admin.new-password}")
+	private String newPassword;
 
 	@BeforeAll
 	public void prepare_tests() {
@@ -84,7 +95,13 @@ public class AuthorizationColtrollerTest {
 				credentials.getEmail());
 		delete("/api/v1/user/email/" + credentials.getEmail(), authHeader);
 		log.info("AuthorizationColtrollerTest | prepare_tests | Limpeza concluída");
-
+	}
+	
+	@AfterAll
+	public void finish_tests() {
+		log.info("AuthorizationColtrollerTest | finish_tests | Deletando usuario {}", user.getEmail());
+		delete("/api/v1/user/email/" + user.getEmail(), authHeader);
+		log.info("AuthorizationColtrollerTest | finish_tests | Finalizando testes...");
 	}
 
 	@Test
@@ -168,5 +185,23 @@ public class AuthorizationColtrollerTest {
 	public void assert_test_user_verified() {
 		log.info("AuthorizationColtrollerTest | assert_test_user_verified | Checando se o email do usuário está verificado");
 		assertTrue(user.isVerified());
+	}
+	
+	@Test
+	@Order(10)
+	public void should_send_password_reset_token() {
+		log.info("AuthorizationColtrollerTest | should_send_password_reset_token | Enviando email para recuperação de senha");
+		Response response = post("/authorization/recovery/" + user.getEmail(), authHeader);
+		assertEquals(response.getStatusCode(), OK.value());
+	}
+	
+	@Test
+	@Order(11)
+	public void should_reset_password() {
+		log.info("AuthorizationColtrollerTest | should_reset_password | Deve resetar a senha do usuario {}", user.getEmail());
+		RecoveryPassword recovery = recoveryRepository.findByEmail(user.getEmail());
+		ResetPassword password = new ResetPassword(user.getEmail(), newPassword, newPassword);
+		Response response = post("/authorization/reset/" + recovery.getToken(), password, authHeader);
+		assertEquals(response.getStatusCode(), OK.value());
 	}
 }

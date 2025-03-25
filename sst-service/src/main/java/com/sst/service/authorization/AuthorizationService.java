@@ -1,17 +1,22 @@
 package com.sst.service.authorization;
 
+import static com.sst.enums.ValidationMessagesType.EXPIRATED_TIME;
+import static com.sst.enums.ValidationMessagesType.INVALID_TOKEN;
 import static com.sst.enums.ValidationMessagesType.TOKEN_NOT_FOUND;
 import static com.sst.enums.ValidationMessagesType.USER_NOT_FOUND;
 import static com.sst.enums.ValidationMessagesType.USER_VERIFIED;
 import static com.sst.enums.user.permission.UserPermissionType.COWORKER;
 import static com.sst.type.status.StatusType.ACTIVE;
 import static java.time.LocalDateTime.now;
+import static org.apache.commons.lang3.time.DateUtils.addMonths;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.Arrays;
+import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sst.exceptions.PasswordMatchingException;
+import com.sst.exceptions.TokenException;
 import com.sst.exceptions.UserNotFound;
 import com.sst.exceptions.UsernameNotFoundException;
 import com.sst.model.user.ConfirmationToken;
@@ -138,7 +144,7 @@ public class AuthorizationService {
 		return confirmationRepository.findByEmail(email);
 	}
 	
-	public void sendRecoverPasswordToken(String email) {
+	public RecoveryPassword sendRecoverPasswordToken(String email) {
 		User user = repository.findByEmail(email);
 		if(user == null) {
 			throw new UserNotFound();
@@ -157,20 +163,31 @@ public class AuthorizationService {
 				e.printStackTrace();
 			}
 		}).start();
+		return recovery;
 	}
 
 	public boolean hasUserByEmail(String email) {
 		return repository.existsByEmail(email);
 	}
 	
-	public void resetPassword(ResetPassword body) {
+	public void resetPassword(ResetPassword body, String token) {
 		User user = repository.findByEmail(body.getEmail());
 		if(user == null) {
 			throw new UserNotFound();
 		}
+		RecoveryPassword recovery = recoveryRepository.findByEmail(body.getEmail());
+		if(!StringUtils.equals(recovery.getToken(), token)) {
+			throw new TokenException(INVALID_TOKEN);
+		}
+		Date expiration = new Date();
+		addMonths(expiration, 1);
+		if(recovery.getCreatedDate().after(expiration)) {
+			throw new TokenException(EXPIRATED_TIME);
+		}
 		if(body.getPassword().equals(body.getConfirmPassword())) {
 			user.setPassword(encoder.encode(body.getPassword()).substring(encoderName.length()));
 			repository.save(user);
+			recoveryRepository.delete(recovery);
 			return;
 		}
 		throw new PasswordMatchingException();

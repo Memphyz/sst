@@ -38,6 +38,8 @@ public class CorsConfiguration {
 								"/v3/api-docs/**",
 								"/actuator"
 								).permitAll()
+						.requestMatchers("/authorization/recovery/**").authenticated()
+						.requestMatchers("/authorization/reset/**").authenticated()
 						.requestMatchers("/api/v1/**").authenticated()
 						.anyRequest().denyAll())
 				.sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

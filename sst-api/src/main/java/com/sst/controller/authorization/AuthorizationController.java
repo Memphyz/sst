@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sst.exceptions.TokenException;
 import com.sst.exceptions.UserAlreadyExistsException;
+import com.sst.model.user.RecoveryPassword;
 import com.sst.model.user.User;
 import com.sst.resources.Credentials;
 import com.sst.resources.Login;
@@ -94,17 +95,18 @@ public class AuthorizationController {
 
 	@Operation(description = "Used to send a recovery token to reset user password")
 	@PostMapping("/recovery/{email}")
-	public ResponseEntity<?> recoverPassword(
+	public ResponseEntity<RecoveryPassword> recoverPassword(
 			@PathVariable @Parameter(description = "A email associated to a user password recovery") String email) {
 		service.sendRecoverPasswordToken(email);
 		return ok().build();
 	}
-	
+
 	@Operation(description = "Used to reset user password")
-	@PostMapping("/reset")
+	@PostMapping("/reset/{token}")
 	public ResponseEntity<?> resetPassword(
-			@RequestBody @Valid @Parameter(description = "A body data required to reset user password by email") ResetPassword body) {
-		service.resetPassword(body);
+			@RequestBody @Valid @Parameter(description = "A body data is required to reset user password by email") ResetPassword body,
+			@PathVariable @Parameter(description = "A valid token sended to email user to reset password") String token) {
+		service.resetPassword(body, token);
 		return ok().build();
 	}
 
