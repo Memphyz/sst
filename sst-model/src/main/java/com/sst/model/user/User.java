@@ -14,7 +14,6 @@ import com.sst.enums.user.permission.UserPermissionType;
 import com.sst.type.status.StatusType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -38,13 +37,13 @@ public class User extends AbstractModelAuditable<String> implements UserDetails 
 	@NotNull
 	@NotBlank
 	@Size(min = 3, max = 120)
-	@SchemaProperty(name = "User name")
+	@Schema(description = "User name")
 	private String name;
 	
 	@NotNull
 	@NotBlank
 	@Size(min = 6, max = 255)
-	@SchemaProperty(name ="User password")
+	@Schema(description ="User password")
 	private String password;
 
 	@Email
@@ -52,21 +51,21 @@ public class User extends AbstractModelAuditable<String> implements UserDetails 
 	@MongoId
 	@Size(min = 5, max = 255)
 	@Indexed(unique=true)
-	@SchemaProperty(name = "User email also used as ID")
+	@Schema(description = "User email also used as ID")
 	private String email;
 	
 	@NotNull
-	@SchemaProperty(name = "A flag that verify if user confirmed your email")
+	@Schema(description = "A flag that verify if user confirmed your email")
 	private boolean verified;
 	
 	@NotNull
 	@Valid
-	@SchemaProperty(name = "User status (ACTIVE or INACTIVE)")
+	@Schema(description = "User status (ACTIVE or INACTIVE)")
 	private StatusType status;
 	
 	@NotNull
 	@Valid
-	@SchemaProperty(name = "User roles access")
+	@Schema(description = "User roles access")
 	private List<UserPermissionType> roles;
 	
 	@JsonIgnore
