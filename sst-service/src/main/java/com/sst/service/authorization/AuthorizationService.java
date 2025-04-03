@@ -16,7 +16,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils;import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sst.abstracts.service.AbstractService;
 import com.sst.exceptions.PasswordMatchingException;
 import com.sst.exceptions.TokenException;
 import com.sst.exceptions.UserNotFound;
@@ -45,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class AuthorizationService {
+public class AuthorizationService extends AbstractService<User, UserRepository> {
 
 	@Autowired
 	private TokenProviderService provider;

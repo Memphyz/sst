@@ -115,7 +115,19 @@ public class PPRA extends AbstractModelAuditable<String> {
 	@NotNull
 	@Schema(description = "Should be greater than Publish Date")
 	private LocalDateTime expirationDate;
-
+	
+	@Size(max = 500, min = 16)
+	@Schema(description = "A Document id or url to index it to a PPRA")
+	private String document;
+	
+	@Size(min = 20, max = 500)
+	@Schema(description = "A Reson for a PPRA Revision")
+	private String revisionReason;
+	
+	@Size(max = 500, min = 16)
+	@Schema(description = "A PPRA responsible signature")
+	private String signature;
+	
 	@Override
 	public String getId() {
 		return this.getCode();

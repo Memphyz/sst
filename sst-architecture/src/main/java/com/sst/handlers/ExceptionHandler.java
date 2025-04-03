@@ -13,6 +13,7 @@ import org.springframework.web.context.request.WebRequest;
 import com.sst.exceptions.AuthenticationException;
 import com.sst.exceptions.ExceptionResponse;
 import com.sst.exceptions.PasswordMatchingException;
+import com.sst.exceptions.ResourceNotFound;
 import com.sst.exceptions.TokenException;
 import com.sst.exceptions.UserNotFound;
 import com.sst.exceptions.UsernameNotFoundException;
@@ -48,6 +49,12 @@ public class ExceptionHandler {
 	public final ResponseEntity<ExceptionResponse> handleException(TokenException ex, WebRequest request) {
 			ExceptionResponse response = getException(ex.getMessage(), request);
 			return new ResponseEntity<ExceptionResponse>(response, FORBIDDEN);
+	}
+	
+	@org.springframework.web.bind.annotation.ExceptionHandler(ResourceNotFound.class)
+	public final ResponseEntity<ExceptionResponse> handleException(ResourceNotFound ex, WebRequest request) {
+			ExceptionResponse response = getException(ex.getMessage(), request);
+			return new ResponseEntity<ExceptionResponse>(response, NOT_FOUND);
 	}
 	
 	@org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
