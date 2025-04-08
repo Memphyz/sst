@@ -1,14 +1,13 @@
 package com.sst.abstracts.service;
 
-import static java.util.Arrays.asList;
+import static org.springframework.data.domain.PageRequest.of;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -20,31 +19,61 @@ public abstract class AbstractService<Document extends AbstractModel<?>, Reposit
 	@Autowired
 	protected Repository repository;
 	
-	@Autowired
-	private MongoTemplate template;
-	
 	@SuppressWarnings("unchecked")
-	private MongoRepository<Document, Object> getDefaultRepository() {
-		return (MongoRepository<Document, Object>) this.repository;
+	private <ID> MongoRepository<Document, ID> getDefaultRepository() {
+		return (MongoRepository<Document, ID>) this.repository;
 	}
 	
 	public <ID> Document findById(ID id) {
 		return getDefaultRepository().findById(id).orElse(null);
 	}
 	
-	public List<Document> findAllBy(Map<String, String> params){
+	public Page<Document> findAllBy(Integer page, Integer size, Map<String, String> params){
 		Query query = new Query();
 		
 		for(Map.Entry<String, String> param : params.entrySet()) {
 			query.addCriteria(Criteria.where(param.getKey()).is(param.getValue()));
-			
 		}
-		@SuppressWarnings("unchecked")
-		Class<Document> documented = (Class<Document>) ((ParameterizedType) getClass()
-                .getGenericSuperclass())
-                .getActualTypeArguments()[0];
-		List<Document> documents = template.find(query, documented);
-		return ObjectUtils.defaultIfNull(documents, asList());
+		
+		Pageable pageable = of(page, size);
+		Page<Document> documents = getDefaultRepository().findAll(pageable);
+		return documents;
 	}
 	
+	public void update(Document entity) {
+		getDefaultRepository().save(entity);
+	}
+	
+	public void delete(Document entity) {
+		getDefaultRepository().delete(entity);
+	}
+	
+	public <ID> void deleteById(ID id) {
+		getDefaultRepository().deleteById(id);
+	}
+	
+	public void save(Document entity) {
+		getDefaultRepository().save(entity);
+	}
+	
+	public Long count() {
+		return getDefaultRepository().count();
+	}
+	
+	public void saveAll(List<Document> entity) {
+		getDefaultRepository().saveAll(entity);
+	}
+	
+	public void deleteAll(List<Document> entity) {
+		getDefaultRepository().deleteAll(entity);
+	}
+	
+	public <ID> Boolean existsById(ID id) {
+		return getDefaultRepository().existsById(id);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <ID> List<Document> findByIds(List<ID> id) {
+		return getDefaultRepository().findAllById((Iterable<Object>) id);
+	}
 }

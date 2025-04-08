@@ -27,7 +27,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@Document
+@Document(collection = "ppra")
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "PPRA model")

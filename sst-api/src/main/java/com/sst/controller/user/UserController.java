@@ -1,5 +1,6 @@
 package com.sst.controller.user;
 
+import static com.sst.constants.UrlMappingConstants.V1;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
@@ -24,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @Tag(description = "findByEmail, deleteById, update, etc...", name = "User API")
-@RequestMapping("/api/v1/user")
+@RequestMapping(V1 + "/user")
 public class UserController {
 	
 	@Autowired

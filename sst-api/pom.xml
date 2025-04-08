@@ -18,5 +18,10 @@
         <artifactId>sst-service</artifactId>
         <version>${project.version}</version>
     </dependency>
+    <dependency>
+        <groupId>com.sst</groupId>
+        <artifactId>sst-architecture</artifactId>
+        <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>
