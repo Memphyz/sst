@@ -53,7 +53,7 @@ public abstract class AbstractService<Document extends AbstractModel<?>, Reposit
 	}
 	
 	public void save(Document entity) {
-		getDefaultRepository().save(entity);
+		getDefaultRepository().insert(entity);
 	}
 	
 	public Long count() {

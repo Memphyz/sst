@@ -137,6 +137,5 @@ public class PPRA extends AbstractModelAuditable<String> {
 	public void setId(String id) {
 		this.setCode(id);
 	}
-	
-	
+
 }
