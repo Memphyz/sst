@@ -14,66 +14,66 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.sst.abstracts.model.AbstractModel;
 
-public abstract class AbstractService<Document extends AbstractModel<?>, Repository extends MongoRepository<Document, ?>>{
-	
+public abstract class AbstractService<Model extends AbstractModel<?>, Repository extends MongoRepository<Model, ?>> {
+
 	@Autowired
 	protected Repository repository;
-	
+
 	@SuppressWarnings("unchecked")
-	private <ID> MongoRepository<Document, ID> getDefaultRepository() {
-		return (MongoRepository<Document, ID>) this.repository;
+	private <ID> MongoRepository<Model, ID> getDefaultRepository() {
+		return (MongoRepository<Model, ID>) this.repository;
 	}
-	
-	public <ID> Document findById(ID id) {
+
+	public <ID> Model findById(ID id) {
 		return getDefaultRepository().findById(id).orElse(null);
 	}
-	
-	public Page<Document> findAllBy(Integer page, Integer size, Map<String, String> params){
+
+	public Page<Model> findAllBy(Integer page, Integer size, Map<String, String> params) {
 		Query query = new Query();
-		
-		for(Map.Entry<String, String> param : params.entrySet()) {
+
+		for (Map.Entry<String, String> param : params.entrySet()) {
 			query.addCriteria(Criteria.where(param.getKey()).is(param.getValue()));
 		}
-		
+
 		Pageable pageable = of(page, size);
-		Page<Document> documents = getDefaultRepository().findAll(pageable);
+		Page<Model> documents = getDefaultRepository().findAll(pageable);
 		return documents;
 	}
-	
-	public void update(Document entity) {
+
+	public void update(Model entity) {
 		getDefaultRepository().save(entity);
 	}
-	
-	public void delete(Document entity) {
+
+	public void delete(Model entity) {
 		getDefaultRepository().delete(entity);
 	}
-	
+
 	public <ID> void deleteById(ID id) {
 		getDefaultRepository().deleteById(id);
 	}
-	
-	public void save(Document entity) {
+
+	public void save(Model entity) {
 		getDefaultRepository().insert(entity);
 	}
-	
+
 	public Long count() {
 		return getDefaultRepository().count();
 	}
-	
-	public void saveAll(List<Document> entity) {
+
+	public void saveAll(List<Model> entity) {
 		getDefaultRepository().saveAll(entity);
 	}
-	
-	public void deleteAll(List<Document> entity) {
+
+	public void deleteAll(List<Model> entity) {
 		getDefaultRepository().deleteAll(entity);
 	}
-	
+
 	public <ID> Boolean existsById(ID id) {
 		return getDefaultRepository().existsById(id);
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public <ID> List<Document> findByIds(List<ID> id) {
+	public <ID> List<Model> findByIds(List<ID> id) {
 		return getDefaultRepository().findAllById((Iterable<Object>) id);
 	}
 }

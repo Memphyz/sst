@@ -16,7 +16,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.apache.commons.lang3.StringUtils;import org.apache.tomcat.util.http.parser.Authorization;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
