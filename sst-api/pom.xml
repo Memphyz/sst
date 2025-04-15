@@ -22,6 +22,13 @@
         <groupId>com.sst</groupId>
         <artifactId>sst-architecture</artifactId>
         <version>${project.version}</version>
+        <classifier>tests</classifier>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.sst</groupId>
+        <artifactId>sst-architecture</artifactId>
+        <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

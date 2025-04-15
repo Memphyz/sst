@@ -8,6 +8,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.sst.TestConfig;
+import com.sst.abstracts.tests.AbstractTest;
+import com.sst.controller.ppra.PPRAController;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,6 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootTest(classes = TestConfig.class)
 @TestInstance(PER_CLASS)
 @TestMethodOrder(OrderAnnotation.class)
-public class PPRATest {
+public class PPRATest extends AbstractTest<PPRAController> {
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Integer getTestId() {
+		return 1;
+	}
 
 }

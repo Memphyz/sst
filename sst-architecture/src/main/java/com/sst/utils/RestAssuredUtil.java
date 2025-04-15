@@ -179,6 +179,16 @@ public class RestAssuredUtil {
 		return given().basePath(url).port(getPort()).contentType(JSON).when().get().then()
 				.log().all().extract().body().as(extractAs);
 	}
+	
+	/**
+	 * Executes a GET request to an API by URL and returns the response.
+	 *
+	 * @param url       The request URL.
+	 * @return The extracted response body as an object of type T.
+	 */
+	public static final Response get(String url) {
+		return given().basePath(url).port(getPort()).contentType(JSON).when().get();
+	}
 
 	/**
 	 * Executes a GET request to an API by URL and returns the response.

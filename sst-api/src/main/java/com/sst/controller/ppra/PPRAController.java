@@ -17,6 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Tag(description = "A PPRA CRUD", name = "PPRA")
 @RequestMapping(V1 + "/ppra")
-public class PPRAController extends AbstractController<PPRA, PPRAResource,PPRAService> {
+public class PPRAController extends AbstractController<PPRA, PPRAResource, PPRAService> {
 
 }
