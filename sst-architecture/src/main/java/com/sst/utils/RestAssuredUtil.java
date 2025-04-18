@@ -57,7 +57,7 @@ public class RestAssuredUtil {
 	 * @param headers headers of request
 	 */
 	public static final <T> T post(String url, Class<T> extractAs, Map<String, String> headers) {
-		return given().basePath(url).port(getPort()).contentType(JSON).when().post().then()
+		return given().basePath(url).port(getPort()).contentType(JSON).headers(headers).when().post().then()
 				.extract().body().as(extractAs);
 	}
 	
@@ -70,7 +70,7 @@ public class RestAssuredUtil {
 	 * @param headers headers of request
 	 */
 	public static final <T> Response post(String url, T body, Map<String, String> headers) {
-		return given().basePath(url).port(getPort()).body(body).contentType(JSON).when().post();
+		return given().basePath(url).port(getPort()).body(body).contentType(JSON).headers(headers).when().post();
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class RestAssuredUtil {
 	 * @param extractAs object extracted by body
 	 */
 	public static final <T, Body extends Object> T post(String url, Body body, Class<T> extractAs, Map<String, String> headers) {
-		return given().basePath(url).port(getPort()).body(body).contentType(JSON).when().post().then()
+		return given().basePath(url).port(getPort()).body(body).contentType(JSON).headers(headers).when().post().then()
 				.extract().body().as(extractAs);
 	}
 

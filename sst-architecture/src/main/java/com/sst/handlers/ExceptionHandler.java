@@ -20,6 +20,7 @@ import java.util.Date;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -32,8 +33,10 @@ import com.sst.exceptions.PasswordMatchingException;
 import com.sst.exceptions.ResourceNotFound;
 import com.sst.exceptions.TokenException;
 import com.sst.exceptions.UserNotFound;
-import com.sst.exceptions.UsernameNotFoundException;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestControllerAdvice
 public class ExceptionHandler {
 
@@ -45,6 +48,12 @@ public class ExceptionHandler {
 
 	@org.springframework.web.bind.annotation.ExceptionHandler(UsernameNotFoundException.class)
 	public final ResponseEntity<ExceptionResponse> handleException(UsernameNotFoundException ex, WebRequest request) {
+		ExceptionResponse response = getException(ex.getMessage(), request, USER_NOT_FOUND);
+		return new ResponseEntity<ExceptionResponse>(response, NOT_FOUND);
+	}
+	
+	@org.springframework.web.bind.annotation.ExceptionHandler(com.sst.exceptions.UsernameNotFoundException.class)
+	public final ResponseEntity<ExceptionResponse> handleException(com.sst.exceptions.UsernameNotFoundException ex, WebRequest request) {
 		ExceptionResponse response = getException(ex.getMessage(), request, USER_NOT_FOUND);
 		return new ResponseEntity<ExceptionResponse>(response, NOT_FOUND);
 	}
@@ -108,10 +117,12 @@ public class ExceptionHandler {
 	}
 
 	public final ExceptionResponse getException(String message, WebRequest request, ValidationMessagesType type) {
+		log.error("ExceptionHandler | getException | {} | {}", message, type.getMessage());
 		return new ExceptionResponse(new Date(), message, request.getDescription(false), type.getMessage());
 	}
 
 	public final ExceptionResponse getException(String message, String detail, ValidationMessagesType type) {
+		log.error("ExceptionHandler | getException | {} | {} | {}", message, detail, type.getMessage());
 		return new ExceptionResponse(new Date(), message, detail, type.getMessage());
 	}
 }

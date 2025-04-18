@@ -19,10 +19,5 @@ import lombok.extern.slf4j.Slf4j;
 @TestMethodOrder(OrderAnnotation.class)
 public class PPRATest extends AbstractTest<PPRAController> {
 	
-	@SuppressWarnings("unchecked")
-	@Override
-	public Integer getTestId() {
-		return 1;
-	}
 
 }

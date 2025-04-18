@@ -1,9 +1,7 @@
 package com.sst.controller.user;
 
 import static com.sst.constants.UrlMappingConstants.V1;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.ResponseEntity.ok;
-import static org.springframework.http.ResponseEntity.status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sst.exceptions.UserNotFound;
 import com.sst.model.user.User;
 import com.sst.service.user.UserService;
 
@@ -36,7 +35,7 @@ public class UserController {
 	public ResponseEntity<?> findByEmail(@PathVariable @NotNull @Parameter(description = "A user email also used by user ID") String email) {
 		User user = service.loadUserByUsername(email);
 		if(user == null) {
-			return status(NOT_FOUND).build();
+			throw new UserNotFound();
 		}
 		return ok(user);
 	}

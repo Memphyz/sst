@@ -49,7 +49,7 @@ public class AuthorizationController {
 	@PostMapping("/signin")
 	public ResponseEntity<?> signIn(
 			@RequestBody @NotNull @Valid @Parameter(description = "Login credentials used to sign in by email and password") Login login) {
-		log.info("POST | signIn | Sign in with credentials: {}", login.toString());
+		log.info("POST | signIn | Sign in with user: {}", login.getEmail());
 		Token token = service.signIn(login);
 		if (token == null) {
 			throw new TokenException(INVALID_CREDENTIALS);
