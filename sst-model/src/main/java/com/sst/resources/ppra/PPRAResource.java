@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import com.sst.abstracts.model.auditable.AbstractModelAuditableResource;
-import com.sst.abstracts.resource.AbstractResource;
 import com.sst.model.ppra.PPRA;
 import com.sst.model.user.User;
 import com.sst.type.disclosure.DisclosureMethodType;

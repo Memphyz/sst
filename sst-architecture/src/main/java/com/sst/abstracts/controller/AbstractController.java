@@ -1,5 +1,6 @@
 package com.sst.abstracts.controller;
 
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -82,20 +83,42 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 
 	@SuppressWarnings("rawtypes")
 	@PostMapping
-	@Operation(description = "Save a document")
+	@Operation(description = "Save or update a document")
 	public ResponseEntity<?> save(@RequestBody @Valid Document entity) {
-		log.info("GET | {} | getById | Salvando documento de id {}", name, entity.getId());
-		service.save(entity);
-		if (entity instanceof AbstractModelAuditable) {
-			AbstractModelAuditable object = (AbstractModelAuditable) entity;
-			log.info("GET | {} | getById | Documento {} salvo com sucesso pelo usuário {}.", name, entity.getId(),
-					object.getCreatedBy());
+		log.info("GET | {} | getById | Verificando se documento já existe", name);
+		Boolean exist = service.findById(entity.getId()) != null;
+		if(!exist) {
+			Document saved = service.save(entity);
+			if (entity instanceof AbstractModelAuditable) {
+				AbstractModelAuditable object = (AbstractModelAuditable) entity;
+				log.info("GET | {} | getById | Documento {} salvo com sucesso pelo usuário {}.", name, entity.getId(),
+						object.getCreatedBy());
+			} else {
+				log.info("GET | {} | getById | Documento {} salvo com sucesso.", name, entity.getId());
+			}
+			return new ResponseEntity<>(saved, CREATED);
 		} else {
-			log.info("GET | {} | getById | Documento {} salvo com sucesso.", name, entity.getId());
+			log.info("GET | {} | getById | Documento de id {} já existe, executando update...", name);
+			Document updated = service.update(entity);
+			return new ResponseEntity<>(updated, OK);
 		}
-		return ok(entity);
 	}
-
+	
+	@PostMapping("/update")
+	@Operation(description = "Update a document")
+	public ResponseEntity<?> update(@RequestBody @Valid Document entity) {
+		log.info("GET | {} | getById | Atualizando o documento com o id: {}", name, entity.getId());
+		Document updated = service.update(entity);
+		if (updated instanceof AbstractModelAuditable) { 
+			@SuppressWarnings("rawtypes")
+			AbstractModelAuditable object = (AbstractModelAuditable) entity;
+			log.info("GET | {} | getById | Documento {} atualizado com sucesso pelo usuário {}!", name, entity.getId(), object.getUpdatedBy());
+			return new ResponseEntity<>(updated, OK);
+		}
+		log.info("GET | {} | getById | Documento {} atualizado com sucesso!", name, entity.getId());
+		return new ResponseEntity<>(updated, OK);
+	}
+	
 	@DeleteMapping
 	@Operation(description = "Delete a document")
 	public ResponseEntity<?> delete(@RequestBody Document entity) {

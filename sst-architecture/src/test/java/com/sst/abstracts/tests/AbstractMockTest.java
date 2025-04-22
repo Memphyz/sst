@@ -1,36 +1,49 @@
 package com.sst.abstracts.tests;
 
+import static jakarta.validation.Validation.buildDefaultValidatorFactory;
+import static org.instancio.settings.Keys.BEAN_VALIDATION_ENABLED;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Set;
 
 import org.instancio.Instancio;
+import org.instancio.settings.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.mifmif.common.regex.Generex;
 import com.sst.abstracts.controller.AbstractController;
+import com.sst.abstracts.model.AbstractModelResource;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Pattern;
 
 public abstract class AbstractMockTest<Controller extends AbstractController<?, ?, ?>> {
 
 	@Autowired
 	protected Controller controller;
 
-	private Object mockModel;
 	private Object mockResource;
+
+	@SuppressWarnings("unchecked")
+	protected <Resource extends AbstractModelResource<?, ?, ?>> Resource getResource(Class<Resource> clazz) {
+		return (Resource) mockResource;
+	}
 	
 	@SuppressWarnings("unchecked")
-	protected <M> M getModel() {
-		return (M) mockModel;
+	protected <Resource extends AbstractModelResource<?, ?, ?>> Resource getResource() {
+		return (Resource) mockResource;
+	}
+	
+	protected <Resource extends AbstractModelResource<?, ?, ?>> void setResource(Resource resource) {
+		mockResource = resource;
 	}
 
-	
-	@SuppressWarnings("unchecked")
-	protected <DTO> DTO getResource() {
-		return (DTO) mockResource;
-	}
-	
 	protected void setup() {
 		Type[] genericTypes = getControllerGenericTypes();
 		if (genericTypes.length >= 2) {
-			mockModel = createMockInstance(genericTypes[0]);
 			mockResource = createMockInstance(genericTypes[1]);
 		}
 	}
@@ -56,7 +69,12 @@ public abstract class AbstractMockTest<Controller extends AbstractController<?, 
 
 		throw new IllegalStateException("Error while attempt to extract generic types from controller!");
 	}
-
+	
+	protected <T> T createMockInstance() {
+		Type[] genericTypes = getControllerGenericTypes();
+		return createMockInstance(genericTypes[1]);
+	}
+	
 	@SuppressWarnings("unchecked")
 	private <T> T createMockInstance(Type type) {
 		try {
@@ -68,10 +86,34 @@ public abstract class AbstractMockTest<Controller extends AbstractController<?, 
 			} else {
 				throw new IllegalArgumentException("Mock type unsuportted: " + type);
 			}
-			return Instancio.create(clazz);
+			T instance = Instancio.of(clazz).withSettings(Settings.create().set(BEAN_VALIDATION_ENABLED, true))
+					.create();
+			generateAllPatterns(instance);
+			Validator validator = buildDefaultValidatorFactory().getValidator();
+			Set<ConstraintViolation<T>> violations = validator.validate(instance);
+			if(!violations.isEmpty()) {
+				throw new IllegalStateException("Object created does not respect jakarta validations");
+			}
+			return instance;
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to create a mock for: " + type, e);
 		}
+	}
+	
+	private <T> T generateAllPatterns(T instance) {
+		for (Field field : instance.getClass().getDeclaredFields()) {
+	        field.setAccessible(true);
+	        Pattern pattern = field.getAnnotation(Pattern.class);
+	        if (pattern != null && field.getType().equals(String.class)) {
+	            String validValue = new Generex(pattern.regexp()).random();
+	            try {
+					field.set(instance, validValue);
+				} catch (Exception e) {
+					throw new RuntimeException("Error on create a valid regex to " + field.getName());
+				}
+	        }
+	    }
+		return instance;
 	}
 
 }

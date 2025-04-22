@@ -5,12 +5,13 @@ import static com.sst.enums.user.permission.UserPermissionType.TEST;
 import static com.sst.utils.RestAssuredUtil.delete;
 import static com.sst.utils.RestAssuredUtil.get;
 import static com.sst.utils.RestAssuredUtil.post;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.sst.abstracts.controller.AbstractController;
+import com.sst.abstracts.model.AbstractModelResource;
 
 import io.restassured.response.Response;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -66,6 +68,11 @@ public abstract class AbstractTest<Controller extends AbstractController<?, ?, ?
 		}
         return tag.name();
     }
+	
+	@SuppressWarnings("unchecked")
+	protected <ID> ID getId() {
+		return (ID) this.getResource().getId();
+	}
 
 	@BeforeAll
 	public void beforeStart() {
@@ -108,21 +115,43 @@ public abstract class AbstractTest<Controller extends AbstractController<?, ?, ?
 	public void should_create_mock_model() {
 		log.info("{} | AbstractTest | POST | Criando resource utilizando método post", controllerName);
 		Response response = post(baseUrl, (Object) this.getResource(),  this.getAuthHeader());
-		assertEquals(response.getStatusCode(), CREATED, controllerName + " | POST | should_create_mock_model | Falha ao criar " + name + " Code: " + response.getStatusCode());
+		assertEquals(response.getStatusCode(), CREATED.value(), controllerName + " | POST | should_create_mock_model | Falha ao criar " + name + " Code: " + response.getStatusCode());
 	}
 	
 	@Test
-	public void should_save_by_id() {
-//		Response response = get(baseUrl + "/" + this.getTestId(), this.getAuth());
-//		Map<String, ?> body = response.body().as(Map.class);
-//		assertNotNull(response);
-		assertTrue(true);
+	public void should_get_by_id() {
+		Response response = get(baseUrl + "/" + this.getId(), this.getAuthHeader());
+		Map<?, ?> body = response.body().as(Map.class);
+		assertEquals(response.getStatusCode(), OK.value());
+		assertNotNull(body.get("id"));
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void should_update_document() {
+		@SuppressWarnings("rawtypes")
+		AbstractModelResource newInstance = createMockInstance();
+		newInstance.setId(this.getResource().getId());
+		assertNotEquals(this.getResource().toString(), newInstance.toString());
+		Response response = post(baseUrl, newInstance, this.getAuthHeader());
+		String bodyRaw = response.body().asPrettyString();
+		Map<?, ?> body = response.body().as(Map.class);
+		assertEquals(response.getStatusCode(), CREATED.value());
+		assertNotNull(body.get("id"));
+		this.setResource(newInstance);
+		Response updated = get(baseUrl + "/" + this.getId(), this.getAuthHeader());
+		Object newBodyRaw = updated.body().asPrettyString();
+		assertNotEquals(bodyRaw, newBodyRaw);
 	}
 
 	@AfterAll
 	public void finish_tests() {
-		log.info("AuthorizationColtrollerTest | finish_tests | Deletando usuario {}", getEmail());
-		delete("/api/v1/user/email/" + getEmail());
-		log.info("AuthorizationColtrollerTest | finish_tests | Finalizando testes...");
+		log.info("{} | AuthorizationColtrollerTest | finish_tests | Deletando usuario {}",controllerName,  getEmail());
+		Response user = delete("/api/v1/user/email/" + getEmail(), this.getAuthHeader());
+		assertEquals(user.getStatusCode(), OK.value());
+		log.info("{} | AuthorizationColtrollerTest | finish_tests | Deletando documento {}",controllerName,  this.getId());
+		Response resource = delete(baseUrl + "/" + this.getId(), this.getAuthHeader());
+		assertEquals(resource.getStatusCode(), OK.value());
+		log.info("{} | AuthorizationColtrollerTest | finish_tests | Finalizando testes...", controllerName);
 	}
 }

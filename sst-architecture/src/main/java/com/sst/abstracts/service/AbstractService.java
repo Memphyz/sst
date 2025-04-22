@@ -40,8 +40,8 @@ public abstract class AbstractService<Model extends AbstractModel<?>, Repository
 		return documents;
 	}
 
-	public void update(Model entity) {
-		getDefaultRepository().save(entity);
+	public Model update(Model entity) {
+		return getDefaultRepository().save(entity);
 	}
 
 	public void delete(Model entity) {
@@ -52,8 +52,8 @@ public abstract class AbstractService<Model extends AbstractModel<?>, Repository
 		getDefaultRepository().deleteById(id);
 	}
 
-	public void save(Model entity) {
-		getDefaultRepository().insert(entity);
+	public Model save(Model entity) {
+		return getDefaultRepository().insert(entity);
 	}
 
 	public Long count() {
