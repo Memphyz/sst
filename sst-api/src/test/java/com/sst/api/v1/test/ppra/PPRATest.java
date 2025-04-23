@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.sst.TestConfig;
 import com.sst.abstracts.tests.AbstractTest;
 import com.sst.controller.ppra.PPRAController;
-import com.sst.resources.ppra.PPRAResource;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,12 +18,5 @@ import lombok.extern.slf4j.Slf4j;
 @TestInstance(PER_CLASS)
 @TestMethodOrder(OrderAnnotation.class)
 public class PPRATest extends AbstractTest<PPRAController> {
-	
-	@Override
-	@SuppressWarnings("unchecked")
-	protected String getId() {
-		return this.getResource(PPRAResource.class).getCode();
-	}
-
 
 }

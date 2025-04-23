@@ -125,5 +125,17 @@ public class PPRAResource extends AbstractModelAuditableResource<PPRA, PPRAResou
 	@Size(max = 500, min = 16)
 	@Schema(description = "A PPRA responsible signature")
 	private String signature;
+
+	@Override
+	public String getId() {
+		return code;
+	}
+
+	@Override
+	public void setId(String id) {
+		this.code = id;
+	}
+	
+	
 	
 }

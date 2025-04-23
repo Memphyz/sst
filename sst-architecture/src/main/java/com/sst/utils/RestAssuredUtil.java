@@ -204,6 +204,19 @@ public class RestAssuredUtil {
 	}
 	
 	/**
+	 * Executes a GET request to an API by URL and returns the response.
+	 * object.
+	 *
+	 * @param url       The request URL.
+	 * @param params Request query params
+	 * @param headers   The request headers
+	 * @return The extracted response body as an object of type T.
+	 */
+	public static final Response get(String url, Map<String, String> params, Map<String, String> headers) {
+		return given().basePath(url).port(getPort()).contentType(JSON).params(params).headers(headers).when().get();
+	}
+	
+	/**
 	 * Executes a GET request to an API by URL and returns the {@link Response}
 	 * object.
 	 *
@@ -285,6 +298,32 @@ public class RestAssuredUtil {
 		return given().basePath(url).port(getPort()).contentType(JSON).when().delete();
 	}
 
+	/**
+	 * Executes a DELETE request qith body to an API by URL and returns {@link Response}.
+	 * 
+	 * @param url     URL of the request
+	 * @param body    Body of request
+	 * @param headers The URL headers
+	 * @return
+	 * @return Response of request
+	 */
+	public static final <Body extends Object> Response delete(String url, Body body, Map<String, String> headers) {
+		return given().basePath(url).port(getPort()).contentType(JSON).body(body).headers(headers).when().delete();
+	}
+	
+	/**
+	 * Executes a DELETE request qith body to an API by URL and returns {@link Response}.
+	 * 
+	 * @param url     URL of the request
+	 * @param params    Params of request
+	 * @param headers The URL headers
+	 * @return
+	 * @return Response of request
+	 */
+	public static final Response delete(String url, Map<String, String> params, Map<String, String> headers) {
+		return given().basePath(url).port(getPort()).contentType(JSON).params(params).headers(headers).when().delete();
+	}
+	
 	/**
 	 * Executes a DELETE request to an API by URL and returns {@link Response}.
 	 * 

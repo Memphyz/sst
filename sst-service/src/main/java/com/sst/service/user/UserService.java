@@ -23,6 +23,7 @@ public class UserService implements UserDetailsService {
 	public User loadUserByUsername(String email) throws UsernameNotFoundException {
 		User user= repository.findByEmail(email);
 		if(user == null) {
+			log.error("UserService | loadUserByUsername | User with email {} not exists", email);
 			throw new UsernameNotFoundException(USER_NOT_FOUND.getMessage());
 		}
 		return user;

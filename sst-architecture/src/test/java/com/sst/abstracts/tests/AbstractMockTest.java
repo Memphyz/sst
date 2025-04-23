@@ -1,11 +1,14 @@
 package com.sst.abstracts.tests;
 
 import static jakarta.validation.Validation.buildDefaultValidatorFactory;
+import static java.util.stream.Collectors.toList;
 import static org.instancio.settings.Keys.BEAN_VALIDATION_ENABLED;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.instancio.Instancio;
@@ -26,10 +29,23 @@ public abstract class AbstractMockTest<Controller extends AbstractController<?, 
 	protected Controller controller;
 
 	private Object mockResource;
+	private List<Object> mockResources = new ArrayList<Object>();
+	
+	protected final static Integer MOCK_RESOURCES_LIST_QUANTITY = 20;
 
 	@SuppressWarnings("unchecked")
 	protected <Resource extends AbstractModelResource<?, ?, ?>> Resource getResource(Class<Resource> clazz) {
 		return (Resource) mockResource;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected <Resource extends AbstractModelResource<?, ?, ?>> List<Resource> getResources(Class<Resource> clazz) {
+		return mockResources.stream().map(resource -> (Resource) resource).collect(toList());
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected <Resource extends AbstractModelResource<?, ?, ?>> List<Resource> getResources() {
+		return mockResources.stream().map(resource -> (Resource) resource).collect(toList());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -45,6 +61,9 @@ public abstract class AbstractMockTest<Controller extends AbstractController<?, 
 		Type[] genericTypes = getControllerGenericTypes();
 		if (genericTypes.length >= 2) {
 			mockResource = createMockInstance(genericTypes[1]);
+			for (int i = 0; i < MOCK_RESOURCES_LIST_QUANTITY; i++) {
+				mockResources.add(createMockInstance(genericTypes[1]));
+			}
 		}
 	}
 

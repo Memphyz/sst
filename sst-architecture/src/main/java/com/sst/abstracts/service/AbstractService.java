@@ -43,6 +43,10 @@ public abstract class AbstractService<Model extends AbstractModel<?>, Repository
 	public Model update(Model entity) {
 		return getDefaultRepository().save(entity);
 	}
+	
+	public List<Model> update(List<Model> entities) {
+		return getDefaultRepository().saveAll(entities);
+	}
 
 	public void delete(Model entity) {
 		getDefaultRepository().delete(entity);
@@ -60,12 +64,16 @@ public abstract class AbstractService<Model extends AbstractModel<?>, Repository
 		return getDefaultRepository().count();
 	}
 
-	public void saveAll(List<Model> entity) {
-		getDefaultRepository().saveAll(entity);
+	public List<Model> save(List<Model> entities) {
+		return getDefaultRepository().insert(entities);
 	}
 
 	public void deleteAll(List<Model> entity) {
 		getDefaultRepository().deleteAll(entity);
+	}
+	
+	public void deleteAllByIds(List<String> ids) {
+		getDefaultRepository().deleteAllById(ids);
 	}
 
 	public <ID> Boolean existsById(ID id) {

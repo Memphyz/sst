@@ -42,49 +42,50 @@ public class ExceptionHandler {
 
 	@org.springframework.web.bind.annotation.ExceptionHandler(AuthenticationException.class)
 	public final ResponseEntity<ExceptionResponse> handleException(AuthenticationException ex, WebRequest request) {
-		ExceptionResponse response = getException(ex.getMessage(), request, INVALID_CREDENTIALS);
+		ExceptionResponse response = getException(ex, request, INVALID_CREDENTIALS);
 		return new ResponseEntity<ExceptionResponse>(response, FORBIDDEN);
 	}
 
 	@org.springframework.web.bind.annotation.ExceptionHandler(UsernameNotFoundException.class)
 	public final ResponseEntity<ExceptionResponse> handleException(UsernameNotFoundException ex, WebRequest request) {
-		ExceptionResponse response = getException(ex.getMessage(), request, USER_NOT_FOUND);
+		ExceptionResponse response = getException(ex, request, USER_NOT_FOUND);
 		return new ResponseEntity<ExceptionResponse>(response, NOT_FOUND);
 	}
 	
 	@org.springframework.web.bind.annotation.ExceptionHandler(com.sst.exceptions.UsernameNotFoundException.class)
 	public final ResponseEntity<ExceptionResponse> handleException(com.sst.exceptions.UsernameNotFoundException ex, WebRequest request) {
-		ExceptionResponse response = getException(ex.getMessage(), request, USER_NOT_FOUND);
+		ExceptionResponse response = getException(ex, request, USER_NOT_FOUND);
 		return new ResponseEntity<ExceptionResponse>(response, NOT_FOUND);
 	}
 
 	@org.springframework.web.bind.annotation.ExceptionHandler(UserNotFound.class)
 	public final ResponseEntity<ExceptionResponse> handleException(UserNotFound ex, WebRequest request) {
-		ExceptionResponse response = getException(ex.getMessage(), request, USER_NOT_FOUND);
+		ExceptionResponse response = getException(ex, request, USER_NOT_FOUND);
 		return new ResponseEntity<ExceptionResponse>(response, NOT_FOUND);
 	}
 
 	@org.springframework.web.bind.annotation.ExceptionHandler(PasswordMatchingException.class)
 	public final ResponseEntity<ExceptionResponse> handleException(PasswordMatchingException ex, WebRequest request) {
-		ExceptionResponse response = getException(ex.getMessage(), request, PASSWORD_CONFLICT);
+		ExceptionResponse response = getException(ex, request, PASSWORD_CONFLICT);
 		return new ResponseEntity<ExceptionResponse>(response, NOT_FOUND);
 	}
 
 	@org.springframework.web.bind.annotation.ExceptionHandler(TokenException.class)
 	public final ResponseEntity<ExceptionResponse> handleException(TokenException ex, WebRequest request) {
-		ExceptionResponse response = getException(ex.getMessage(), request, INVALID_TOKEN);
+		ExceptionResponse response = getException(ex, request, INVALID_TOKEN);
 		return new ResponseEntity<ExceptionResponse>(response, FORBIDDEN);
 	}
 
 	@org.springframework.web.bind.annotation.ExceptionHandler(ResourceNotFound.class)
 	public final ResponseEntity<ExceptionResponse> handleException(ResourceNotFound ex, WebRequest request) {
-		ExceptionResponse response = getException(ex.getMessage(), request, RESOURCE_NOT_FOUND);
+		ExceptionResponse response = getException(ex, request, RESOURCE_NOT_FOUND);
 		return new ResponseEntity<ExceptionResponse>(response, NOT_FOUND);
 	}
 
 	@org.springframework.web.bind.annotation.ExceptionHandler(MethodArgumentNotValidException.class)
 	public final ResponseEntity<ExceptionResponse> handleException(MethodArgumentNotValidException ex,
 			WebRequest request) {
+		ex.printStackTrace();
 		String message = toSkakeCase(ex.getFieldError().getCode()).toUpperCase() + ": " + ex.getFieldError().getField();
 		String detail = String.join(", ",
 				ex.getFieldErrors().stream()
@@ -100,29 +101,36 @@ public class ExceptionHandler {
 	
 	@org.springframework.web.bind.annotation.ExceptionHandler(DuplicateKeyException.class)
 	public final ResponseEntity<ExceptionResponse> handleException(DuplicateKeyException ex, WebRequest request) {
-		ExceptionResponse response = getException(ex.getMessage(), request, ALREADY_EXISTS);
+		ExceptionResponse response = getException(ex, request, ALREADY_EXISTS);
 		return new ResponseEntity<ExceptionResponse>(response, CONFLICT);
 	}
 
 	@org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
 	public final ResponseEntity<ExceptionResponse> handleException(Exception ex, WebRequest request) {
-		ExceptionResponse response = getException(ex.getMessage(), request, UNKNOWN);
+		ExceptionResponse response = getException(ex, request, UNKNOWN);
 		return new ResponseEntity<ExceptionResponse>(response, INTERNAL_SERVER_ERROR);
 	}
 
 	@org.springframework.web.bind.annotation.ExceptionHandler(TokenExpiredException.class)
 	public final ResponseEntity<ExceptionResponse> handleException(TokenExpiredException ex, WebRequest request) {
-		ExceptionResponse response = getException(ex.getMessage(), request, EXPIRATED_TOKEN);
+		ExceptionResponse response = getException(ex, request, EXPIRATED_TOKEN);
 		return new ResponseEntity<ExceptionResponse>(response, FORBIDDEN);
 	}
 
-	public final ExceptionResponse getException(String message, WebRequest request, ValidationMessagesType type) {
-		log.error("ExceptionHandler | getException | {} | {}", message, type.getMessage());
-		return new ExceptionResponse(new Date(), message, request.getDescription(false), type.getMessage());
+	public final ExceptionResponse getException(Exception ex, WebRequest request, ValidationMessagesType type) {
+		ex.printStackTrace();
+		log.error("ExceptionHandler | request | {} | {}", ex.getMessage(), type.getMessage());
+		return new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false), type.getMessage());
 	}
 
-	public final ExceptionResponse getException(String message, String detail, ValidationMessagesType type) {
-		log.error("ExceptionHandler | getException | {} | {} | {}", message, detail, type.getMessage());
+	public final ExceptionResponse getException(Exception ex,String detail, ValidationMessagesType type) {
+		ex.printStackTrace();
+		log.error("ExceptionHandler | ex | {} | {} | {}", ex.getMessage(), detail, type.getMessage());
+		return new ExceptionResponse(new Date(), ex.getMessage(), detail, type.getMessage());
+	}
+	
+	public final ExceptionResponse getException(String message,String detail, ValidationMessagesType type) {
+		log.error("ExceptionHandler | message | {} | {} | {}", message, detail, type.getMessage());
 		return new ExceptionResponse(new Date(), message, detail, type.getMessage());
 	}
 }
