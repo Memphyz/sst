@@ -16,6 +16,7 @@
 	   <module>sst-assembler</module>
 	   <module>sst-authorization</module>
 	   <module>sst-architecture</module>
+	   <module>sst-http-client</module>
 	</modules>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -49,6 +50,10 @@
 		   <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 		   <version>${web-mvc.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -139,7 +144,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-				    <mainClass>com.sst.HealthRibInitializer</mainClass>
+				    <mainClass>com.sst.Statup</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>

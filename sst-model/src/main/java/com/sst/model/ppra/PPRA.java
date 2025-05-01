@@ -15,7 +15,6 @@ import com.sst.type.sectors.ResponsibleSectorType;
 import com.sst.type.status.StatusType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -61,22 +60,20 @@ public class PPRA extends AbstractModelAuditable<String> {
 	private LocalDateTime revisionDate;
 	
 	@NotNull
-	@Valid
 	@Schema(description = "A Status of PPRA (ACTIVE of INACTIVE)")
 	private StatusType status;
 	
-	@DBRef
+	@DBRef(db = "user")
 	@NotNull
 	@Schema(description = "A association of a User document previously created")
 	private User developerId;
 	
-	@DBRef
+	@DBRef(db = "user")
 	@NotNull
 	@Schema(description = "A association of a User document previously created")
 	private User approverId;
 	
 	@NotNull
-	@Valid
 	@Schema(description = "Responsible Sector of this PPRA")
 	private ResponsibleSectorType sector;
 	
@@ -108,7 +105,6 @@ public class PPRA extends AbstractModelAuditable<String> {
 	private List<ResponsibleSectorType> promotionDepartments;
 	
 	@NotNull
-	@Valid
 	@Schema(description = "A PPRA Disclosure Method")
 	private DisclosureMethodType disclosureMethod;
 	

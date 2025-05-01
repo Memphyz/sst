@@ -5,30 +5,8 @@
     <artifactId>sst</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>sst-service</artifactId>
-  <dependencies>
-    <dependency>
-        <groupId>com.sst</groupId>
-        <artifactId>sst-model</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>com.sst</groupId>
-        <artifactId>sst-architecture</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>com.sst</groupId>
-        <artifactId>sst-repository</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-     <dependency>
-        <groupId>com.sst</groupId>
-        <artifactId>sst-http-client</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-  </dependencies>
-  <build>
+  <artifactId>sst-http-client</artifactId>
+    <build>
     <plugins>
         <plugin>
             <groupId>org.springframework.boot</groupId>
@@ -45,4 +23,5 @@
         </plugin>
     </plugins>
 </build>
+
 </project>
