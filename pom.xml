@@ -144,7 +144,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-				    <mainClass>com.sst.Statup</mainClass>
+				    <mainClass>com.sst.Startup</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
