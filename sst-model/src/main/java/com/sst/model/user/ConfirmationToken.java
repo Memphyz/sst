@@ -5,6 +5,7 @@ import static java.util.UUID.randomUUID;
 import java.util.Date;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -37,6 +38,7 @@ public class ConfirmationToken extends AbstractModel<String> {
 	    private String confirmationToken;
 	    
 	    @CreatedDate
+	    @Indexed
 	    @Schema(description = "A creation date of a user confirmation token")
 	    private Date createdDate;
 	    

@@ -15,6 +15,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +108,14 @@ public class AuthorizationService extends AbstractService<User, UserRepository> 
 		}
 		return provider.refreshToken(token);
 	}
+	
+	public void deleteManyRecoverys(List<RecoveryPassword> entities) {
+		recoveryRepository.deleteAll(entities);
+	}
+	
+	public void deleteManyConfirmationTokens(List<ConfirmationToken> entities) {
+		confirmationRepository.deleteAll(entities);
+	}
 
 	@Transactional
 	public User signup(Credentials credential) {
@@ -143,6 +152,14 @@ public class AuthorizationService extends AbstractService<User, UserRepository> 
 	
 	public ConfirmationToken findConfirmationTokenByEmail(String email) {
 		return confirmationRepository.findByEmail(email);
+	}
+	
+	public List<ConfirmationToken> findAllConfirmationTokenExpired() {
+		return confirmationRepository.findAllExpired();
+	}
+	
+	public List<RecoveryPassword> findAllRecoveryPasswordExpired() {
+		return recoveryRepository.findAllExpired();
 	}
 	
 	public RecoveryPassword sendRecoverPasswordToken(String email) {
