@@ -228,12 +228,14 @@ public abstract class AbstractTest<Controller extends AbstractController<?, ?, ?
 	
 	@AfterAll
 	public void finish_tests() {
-		should_delete_reosurce(getResource());
+		if(getResource() != null) {
+			should_delete_resource(getResource());
+		}
 		should_delete_all_mocks();
 		log.info("{} | AuthorizationColtrollerTest | finish_tests | Finalizando testes...", controllerName);
 	}
 
-	private void should_delete_reosurce(AbstractModelResource<?, ?, ?> resource) {
+	private void should_delete_resource(AbstractModelResource<?, ?, ?> resource) {
 		log.info("{} | AuthorizationColtrollerTest | finish_tests | Deletando documento {}",controllerName,  this.getId());
 		Response response = delete(baseUrl + "/" + this.getId(resource), this.getAuthHeader());
 		assertEquals(response.getStatusCode(), OK.value());

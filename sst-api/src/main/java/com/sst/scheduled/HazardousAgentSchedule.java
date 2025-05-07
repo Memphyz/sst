@@ -18,7 +18,9 @@ public class HazardousAgentSchedule {
 	@Autowired
 	private EsocialTablesService service;
 	
-	@Scheduled(cron = "0 0 9 * * ?", zone = "America/Sao_Paulo")
+	private static final long ONE_DAY = 24 * 60 * 60 * 1000;
+	
+	@Scheduled(fixedDelay = ONE_DAY)
 	public void updateHazardousAgentCollection() {
 		log.info("HazardousAgentSchedule | Scheduled | updateHazardousAgentCollection | Updating Hazardous Agent collection");
 		List<HazardousAgent> agents = service.findAllHazardousAgent();

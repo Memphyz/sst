@@ -62,7 +62,6 @@ public class Sector extends AbstractModelAuditable<String> {
 
 	@DateTimeFormat(pattern = "hh:mm")
 	@NotNull
-	@NotBlank
 	@Schema(description = "Sector opening hours")
 	private LocalTime businessHours;
 

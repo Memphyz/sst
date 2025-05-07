@@ -89,6 +89,10 @@ public abstract class AbstractMockTest<Controller extends AbstractController<?, 
 		throw new IllegalStateException("Error while attempt to extract generic types from controller!");
 	}
 	
+	public Object fixMockCreation(Object mock) {
+		return mock;
+	}
+	
 	protected <T> T createMockInstance() {
 		Type[] genericTypes = getControllerGenericTypes();
 		return createMockInstance(genericTypes[1]);
@@ -108,10 +112,11 @@ public abstract class AbstractMockTest<Controller extends AbstractController<?, 
 			T instance = Instancio.of(clazz).withSettings(Settings.create().set(BEAN_VALIDATION_ENABLED, true))
 					.create();
 			generateAllPatterns(instance);
+			instance = (T) fixMockCreation(instance);
 			Validator validator = buildDefaultValidatorFactory().getValidator();
 			Set<ConstraintViolation<T>> violations = validator.validate(instance);
 			if(!violations.isEmpty()) {
-				throw new IllegalStateException("Object created does not respect jakarta validations");
+				throw new IllegalStateException("Object created does not respect jakarta validations. Violations: " + violations.toString());
 			}
 			return instance;
 		} catch (Exception e) {
@@ -124,7 +129,10 @@ public abstract class AbstractMockTest<Controller extends AbstractController<?, 
 	        field.setAccessible(true);
 	        Pattern pattern = field.getAnnotation(Pattern.class);
 	        if (pattern != null && field.getType().equals(String.class)) {
-	            String validValue = new Generex(pattern.regexp()).random();
+	        	String cleanRegex = pattern.regexp()
+	                    .replaceAll("^\\^", "")
+	                    .replaceAll("\\$$", "");
+	            String validValue = new Generex(cleanRegex).random();
 	            try {
 					field.set(instance, validValue);
 				} catch (Exception e) {

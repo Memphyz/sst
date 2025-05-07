@@ -1,6 +1,7 @@
 package com.sst.abstracts.controller;
 
 import static com.sst.enums.ValidationMessagesType.NOT_NULL;
+import static java.lang.Math.max;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -32,6 +33,7 @@ import com.sst.abstracts.service.AbstractService;
 import com.sst.exceptions.ResourceNotFound;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -63,7 +65,7 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 
 	@GetMapping("/{id}")
 	@Operation(description = "A default getter document by id")
-	public ResponseEntity<?> getById(@NotNull @PathVariable String id) {
+	public ResponseEntity<?> getById(@NotNull @PathVariable @Parameter(description = "A id of document that will be got from database") String id) {
 		log.info("GET | {} | getById | Buscando documento de id {}", name, id);
 		Document document = service.findById(id);
 		if (document == null) {
@@ -76,10 +78,11 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 	
 	@GetMapping
 	@Operation(description = "Paginated list of documents with custom parameters")
-	public ResponseEntity<?> getAllBy(@RequestParam(defaultValue = "0") final Integer page,
-			@RequestParam(defaultValue = "5") final Integer size, @RequestParam Map<String, String> params) {
+	public ResponseEntity<?> getAllBy(@RequestParam(defaultValue = "0") @Parameter(description = "A page offset of a list. Min value as 0")  final Integer page,
+			@RequestParam(defaultValue = "5") @Parameter(description = "A size limit of a list. Min value as 5") final Integer size,
+			@RequestParam @Parameter(description = "A list of params to query on find all") Map<String, String> params) {
 		log.info("GET | {} | getAllBy | Buscando documentos na pagina {} com o tamanho maximo de {}", name, page, size);
-		Page<Document> documents = service.findAllBy(page, size, params);
+		Page<Document> documents = service.findAllBy(max(page, 0), max(size, 5), params);
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.set("X-Content-Range", documents.getSize() + "/" + documents.getTotalElements());
 		responseHeaders.set("X-Content-Pages", String.valueOf(documents.getTotalPages()));
@@ -91,7 +94,7 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 	@SuppressWarnings("rawtypes")
 	@PostMapping
 	@Operation(description = "Save or update a document")
-	public ResponseEntity<?> save(@RequestBody @Valid Document entity) {
+	public ResponseEntity<?> save(@RequestBody @Valid @Parameter(description = "A document json that will be saved on the database") Document entity) {
 		log.info("POST | {} | save | Verificando se documento já existe", name);
 		Boolean exist = service.findById(entity.getId()) != null;
 		if(!exist) {
@@ -113,7 +116,7 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 	
 	@PostMapping("/all")
 	@Operation(description = "Save or update multiple documents")
-	public ResponseEntity<?> saveAll(@RequestBody @Valid List<Document> entities) {
+	public ResponseEntity<?> saveAll(@RequestBody @Valid @Parameter(description = "A document json list that will be all saved on the database") List<Document> entities) {
 		log.info("POST | {} | saveAll | Verificando documentos já existentes e documentos novos", name);
 		List<Document> unsaved = entities.stream().filter(entity -> !service.existsById(entity.getId())).collect(toList());
 		List<Document> saved = entities.stream().filter(entity -> !unsaved.contains(entity)).collect(toList());
@@ -134,8 +137,8 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 	@DeleteMapping("/all")
 	@Operation(description = "Delete multiple documents by document body or by ids list. If a list of ids was provided, the method will prioritize ids by performatic reasons")
 	public ResponseEntity<?> deleteAll(
-			@RequestBody @Nullable @Valid List<Document> entities,
-			@RequestParam @Nullable List<String> ids) {
+			@RequestBody @Nullable @Valid @Parameter(description = "A document json list that will be all deleted on the database") List<Document> entities,
+			@RequestParam @Nullable @Parameter(description = "A document json list ids that will be all deleted on the database")  List<String> ids) {
 		if(ids != null && !ids.isEmpty()) {
 			log.info("DELETE | {} | deleteAll | Deletando {} documentos por ids", name, ids.size());
 			service.deleteAllByIds(ids);
@@ -153,7 +156,7 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 	
 	@PostMapping("/update")
 	@Operation(description = "Update a document")
-	public ResponseEntity<?> update(@RequestBody @Valid Document entity) {
+	public ResponseEntity<?> update(@RequestBody @Valid @Parameter(description = "A document json that will be updated on the database") Document entity) {
 		log.info("POST | {} | update | Atualizando o documento com o id: {}", name, entity.getId());
 		Document updated = service.update(entity);
 		if (updated instanceof AbstractModelAuditable) { 
@@ -168,7 +171,7 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 	
 	@DeleteMapping
 	@Operation(description = "Delete a document")
-	public ResponseEntity<?> delete(@RequestBody Document entity) {
+	public ResponseEntity<?> delete(@RequestBody @Parameter(description = "A document json that will be deleted on the database") Document entity) {
 		log.info("DELETE | {} | delete | Deletando documento", name);
 		service.delete(entity);
 		log.info("DELETE | {} | delete | Documento {} deletado com sucesso!", name, entity.getId());
@@ -177,7 +180,7 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 
 	@DeleteMapping("/{id}")
 	@Operation(description = "Delete a document by id")
-	public ResponseEntity<?> deleteById(@PathVariable String id) {
+	public ResponseEntity<?> deleteById(@PathVariable @Parameter(description = "A document id that will be deleted on the database") String id) {
 		log.info("DELETE | {} | deleteById | Deletando documento pelo id {}", name, id);
 		service.deleteById(id);
 		log.info("DELETE | {} | deleteById | Documento de id {} deletado com sucesso!", name, id);
