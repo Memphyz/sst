@@ -1,7 +1,7 @@
 package com.sst.authorization;
 
 import static com.sst.enums.ValidationMessagesType.USER_VERIFIED;
-import static com.sst.enums.user.permission.UserPermissionType.TEST;
+import static com.sst.enums.user.permission.UserPermissionType.ADMINISTRATOR;
 import static com.sst.utils.RestAssuredUtil.delete;
 import static com.sst.utils.RestAssuredUtil.get;
 import static com.sst.utils.RestAssuredUtil.post;
@@ -77,7 +77,7 @@ public class AuthorizationColtrollerTest {
 		credentials.setName("JUnit");
 		credentials.setPassword("junit@2025");
 		credentials.setEmail("junit@sstbeforeallsignup.com");
-		credentials.setRoles(asList(TEST));
+		credentials.setRoles(asList(ADMINISTRATOR));
 		log.info("AuthorizationColtrollerTest | prepare_tests | Obtendo token de ADMINISTRADOR para realizar alterações no banco");
 		Token token = post("/authorization/signin", new Login(adminEmail, adminPassword), Token.class);
 		authHeader.put("Authorization", "Bearer " + token.getAccessToken());
@@ -121,7 +121,7 @@ public class AuthorizationColtrollerTest {
 		assertEquals(credentials.getName(), "JUnit");
 		assertEquals(credentials.getPassword(), "junit@2025");
 		assertEquals(credentials.getEmail(), "junit@sstbeforeallsignup.com");
-		assertEquals(credentials.getRoles(), asList(TEST));
+		assertEquals(credentials.getRoles(), asList(ADMINISTRATOR));
 	}
 
 	@Test

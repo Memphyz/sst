@@ -8,6 +8,7 @@ import static com.sst.enums.ValidationMessagesType.PASSWORD_CONFLICT;
 import static com.sst.enums.ValidationMessagesType.RESOURCE_NOT_FOUND;
 import static com.sst.enums.ValidationMessagesType.UNKNOWN;
 import static com.sst.enums.ValidationMessagesType.USER_NOT_FOUND;
+import static com.sst.enums.ValidationMessagesType.USER_ROLE_PERMISSION;
 import static com.sst.utils.StringUtils.toSkakeCase;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -33,6 +34,7 @@ import com.sst.exceptions.PasswordMatchingException;
 import com.sst.exceptions.ResourceNotFound;
 import com.sst.exceptions.TokenException;
 import com.sst.exceptions.UserNotFound;
+import com.sst.exceptions.UserPermissionDenied;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -114,6 +116,12 @@ public class ExceptionHandler {
 	@org.springframework.web.bind.annotation.ExceptionHandler(TokenExpiredException.class)
 	public final ResponseEntity<ExceptionResponse> handleException(TokenExpiredException ex, WebRequest request) {
 		ExceptionResponse response = getException(ex, request, EXPIRATED_TOKEN);
+		return new ResponseEntity<ExceptionResponse>(response, FORBIDDEN);
+	}
+	
+	@org.springframework.web.bind.annotation.ExceptionHandler(UserPermissionDenied.class)
+	public final ResponseEntity<ExceptionResponse> handleException(UserPermissionDenied ex, WebRequest request) {
+		ExceptionResponse response = getException(ex, request, USER_ROLE_PERMISSION);
 		return new ResponseEntity<ExceptionResponse>(response, FORBIDDEN);
 	}
 

@@ -1,5 +1,9 @@
 package com.sst.enums.user.permission;
 
+import static java.util.Arrays.asList;
+
+import java.util.List;
+
 import org.springframework.security.core.GrantedAuthority;
 
 import lombok.AllArgsConstructor;
@@ -9,12 +13,13 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum UserPermissionType implements GrantedAuthority {
 	
-	ADMIN("ADMIN"),
-	TEST("TEST"),
 	MANAGER("MANAGER"),
 	COWORKER("COWORKER"),
 	AUDITOR("AUDITOR"),
 	DOCTOR("DOCTOR"),
+	SECUTIRY_MANAGER("SECUTIRY_MANAGER"),
+	BUSINESS("BUSINESS"),
+	ADMINISTRATOR("ADMINISTRATOR"),
 	OUTSOURCED("OUTSOURCED");
 
 	private String name;
@@ -23,5 +28,7 @@ public enum UserPermissionType implements GrantedAuthority {
 	public String getAuthority() {
 		return this.name;
 	}
+	
+	public static final List<UserPermissionType> ALL = asList(MANAGER, COWORKER, AUDITOR, DOCTOR, SECUTIRY_MANAGER, BUSINESS, ADMINISTRATOR, OUTSOURCED);
 	
 }

@@ -9,7 +9,6 @@ import static com.sst.enums.user.permission.UserPermissionType.COWORKER;
 import static com.sst.type.status.StatusType.ACTIVE;
 import static java.time.LocalDateTime.now;
 import static org.apache.commons.lang3.time.DateUtils.addMonths;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -75,12 +74,12 @@ public class AuthorizationService extends AbstractService<User, UserRepository> 
 	public ResponseEntity<?> confirmEmail(String email, String token) {
 		User user = repository.findByEmail(email);
 		if (user == null) {
-			return ResponseEntity.status(NOT_FOUND).body(USER_NOT_FOUND);
+			throw new UserNotFound();
 		}
 		ConfirmationToken confirmation = confirmationRepository.findByConfirmationToken(token);
 
 		if (confirmation == null) {
-			return ResponseEntity.status(NOT_FOUND).body(TOKEN_NOT_FOUND);
+			throw new TokenException(TOKEN_NOT_FOUND);
 		}
 		user.setVerified(true);
 		repository.save(user);
