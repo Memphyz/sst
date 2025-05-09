@@ -46,7 +46,6 @@ public class IAR extends AbstractModelAuditable<String> {
 	@Valid
 	private Sector sector;
 	
-	@NotBlank
 	@Pattern(regexp = "^(\\d+)$")
 	private String hazardousAgentCode;
 	

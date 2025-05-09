@@ -95,7 +95,9 @@ public abstract class AbstractMockTest<Controller extends AbstractController<?, 
 	
 	protected <T> T createMockInstance() {
 		Type[] genericTypes = getControllerGenericTypes();
-		return createMockInstance(genericTypes[1]);
+		T mock = createMockInstance(genericTypes[1]);
+		mockResources.add(mock);
+		return mock;
 	}
 	
 	@SuppressWarnings("unchecked")

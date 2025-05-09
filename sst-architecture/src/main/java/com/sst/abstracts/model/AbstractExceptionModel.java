@@ -16,5 +16,9 @@ public abstract class AbstractExceptionModel extends RuntimeException {
 	public AbstractExceptionModel(ValidationMessagesType message) {
 		this.message = message.getMessage();
 	}
+	
+	public AbstractExceptionModel(String message) {
+		this.message = message;
+	}
 
 }

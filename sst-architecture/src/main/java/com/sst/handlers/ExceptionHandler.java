@@ -6,6 +6,7 @@ import static com.sst.enums.ValidationMessagesType.INVALID_CREDENTIALS;
 import static com.sst.enums.ValidationMessagesType.INVALID_TOKEN;
 import static com.sst.enums.ValidationMessagesType.PASSWORD_CONFLICT;
 import static com.sst.enums.ValidationMessagesType.RESOURCE_NOT_FOUND;
+import static com.sst.enums.ValidationMessagesType.RESOURCE_VALIDATION;
 import static com.sst.enums.ValidationMessagesType.UNKNOWN;
 import static com.sst.enums.ValidationMessagesType.USER_NOT_FOUND;
 import static com.sst.enums.ValidationMessagesType.USER_ROLE_PERMISSION;
@@ -14,6 +15,7 @@ import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -32,6 +34,7 @@ import com.sst.exceptions.AuthenticationException;
 import com.sst.exceptions.ExceptionResponse;
 import com.sst.exceptions.PasswordMatchingException;
 import com.sst.exceptions.ResourceNotFound;
+import com.sst.exceptions.ResourceValidationException;
 import com.sst.exceptions.TokenException;
 import com.sst.exceptions.UserNotFound;
 import com.sst.exceptions.UserPermissionDenied;
@@ -123,6 +126,12 @@ public class ExceptionHandler {
 	public final ResponseEntity<ExceptionResponse> handleException(UserPermissionDenied ex, WebRequest request) {
 		ExceptionResponse response = getException(ex, request, USER_ROLE_PERMISSION);
 		return new ResponseEntity<ExceptionResponse>(response, FORBIDDEN);
+	}
+	
+	@org.springframework.web.bind.annotation.ExceptionHandler(ResourceValidationException.class)
+	public final ResponseEntity<ExceptionResponse> handleException(ResourceValidationException ex, WebRequest request) {
+		ExceptionResponse response = getException(ex, request, RESOURCE_VALIDATION);
+		return new ResponseEntity<ExceptionResponse>(response, UNPROCESSABLE_ENTITY);
 	}
 
 	public final ExceptionResponse getException(Exception ex, WebRequest request, ValidationMessagesType type) {

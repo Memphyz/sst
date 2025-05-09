@@ -15,7 +15,6 @@ import com.sst.model.responsible.Responsible;
 import com.sst.type.status.StatusType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -35,7 +34,6 @@ public class Sector extends AbstractModelAuditable<String> {
 
 	private static final long serialVersionUID = 1L;
 
-	@Email
 	@NotNull
 	@MongoId
 	@Size(min = 5, max = 5)

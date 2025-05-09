@@ -6,6 +6,7 @@ import static com.sst.utils.RestAssuredUtil.post;
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isNumeric;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -89,7 +89,7 @@ public abstract class AbstractTest<Controller extends AbstractController<?, ?, ?
 				"page", "0"
 				);
 	}
-
+	
 	@BeforeAll
 	public void beforeStart() {
 		super.setup();
@@ -174,7 +174,7 @@ public abstract class AbstractTest<Controller extends AbstractController<?, ?, ?
 	@Order(7)
 	public void should_delete_all_mocks_by_ids() {
 		should_save_all_mocks();
-		String ids = StringUtils.join(",", getResources().stream().map(resource -> getId(resource)).collect(toList()));
+		String ids = join(",", getResources().stream().map(resource -> getId(resource)).collect(toList()));
 		Response response = delete(baseUrl + "/all", Map.of("ids", ids), getAuthHeader());
 		assertEquals(response.getStatusCode(), OK.value());
 	}
