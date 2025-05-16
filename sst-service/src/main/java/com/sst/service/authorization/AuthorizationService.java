@@ -6,7 +6,7 @@ import static com.sst.enums.ValidationMessagesType.TOKEN_NOT_FOUND;
 import static com.sst.enums.ValidationMessagesType.USER_NOT_FOUND;
 import static com.sst.enums.ValidationMessagesType.USER_VERIFIED;
 import static com.sst.enums.user.permission.UserPermissionType.COWORKER;
-import static com.sst.type.status.StatusType.ACTIVE;
+import static com.sst.enums.StatusType.ACTIVE;
 import static java.time.LocalDateTime.now;
 import static org.apache.commons.lang3.time.DateUtils.addMonths;
 import static org.springframework.http.HttpStatus.OK;

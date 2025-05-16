@@ -5,8 +5,8 @@ import static com.sst.enums.InvalidEntityMessageType.DIRTY;
 import static com.sst.enums.InvalidEntityMessageType.INSUFICIENT;
 import static com.sst.enums.InvalidEntityMessageType.MISSING;
 import static com.sst.enums.user.permission.UserPermissionType.MANAGER;
-import static com.sst.type.level.LevelType.HIGH;
-import static com.sst.type.risk.RiskType.CHEMICAL;
+import static com.sst.enums.LevelType.HIGH;
+import static com.sst.enums.RiskType.CHEMICAL;
 import static java.util.stream.Collectors.joining;
 
 import java.util.List;
@@ -39,14 +39,14 @@ public class IARController extends AbstractController<IAR, IARResource, IARServi
 	private PurgoMalumClientHttp purgoMalumHttpClient;
 	
 	@Override
-	public ResponseEntity<?> save(@RequestBody @Valid IAR entity) {
+	public ResponseEntity<?> save(@RequestBody @Valid IARResource entity) {
 		validateExistingControlMeasures(entity.getExistingControlMeasures());
 		validateEntity(entity);
 		return super.save(entity);
 	}
 
 	@Override
-	public ResponseEntity<?> saveAll(@RequestBody @Valid List<IAR> entities) {
+	public ResponseEntity<?> saveAll(@RequestBody @Valid List<IARResource> entities) {
 		entities.forEach(this::validateEntity);
 		String allTexts = entities.stream().map(entity -> entity.getExistingControlMeasures()).collect(joining("__"));
 		validateExistingControlMeasures(allTexts);
@@ -54,7 +54,7 @@ public class IARController extends AbstractController<IAR, IARResource, IARServi
 	}
 	
 
-	private void validateEntity(IAR entity) {
+	private void validateEntity(IARResource entity) {
 		if(entity.getRiskType().equals(CHEMICAL) && entity.getHazardousAgentCode() == null) {
 			throw new ResourceValidationException(MISSING.get("HazardousAgentCode"));
 		}

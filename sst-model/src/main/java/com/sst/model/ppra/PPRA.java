@@ -10,9 +10,9 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import com.sst.abstracts.model.auditable.AbstractModelAuditable;
 import com.sst.model.user.User;
-import com.sst.type.disclosure.DisclosureMethodType;
-import com.sst.type.sectors.ResponsibleSectorType;
-import com.sst.type.status.StatusType;
+import com.sst.enums.DisclosureMethodType;
+import com.sst.enums.ResponsibleSectorType;
+import com.sst.enums.StatusType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

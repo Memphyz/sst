@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.sst.abstracts.model.auditable.AbstractModelAuditable;
 import com.sst.annotations.Future;
 import com.sst.annotations.Past;
-import com.sst.type.status.StatusType;
+import com.sst.enums.StatusType;
 
 import groovyjarjarantlr4.v4.runtime.misc.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;

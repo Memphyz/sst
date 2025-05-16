@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sst.abstracts.model.AbstractModel;
 import com.sst.abstracts.model.auditable.AbstractModelAuditable;
+import com.sst.abstracts.model.auditable.AbstractModelAuditableResource;
 import com.sst.abstracts.resource.AbstractResource;
 import com.sst.abstracts.service.AbstractService;
 import com.sst.builders.RequestPermissionBuilder;
@@ -125,43 +126,48 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 	@SuppressWarnings("rawtypes")
 	@PostMapping
 	@Operation(description = "Save or update a document")
-	public ResponseEntity<?> save(@RequestBody @Valid @Parameter(description = "A document json that will be saved on the database") Document entity) {
+	public ResponseEntity<?> save(@RequestBody @Valid @Parameter(description = "A document json that will be saved on the database") Resource entity) {
 		this.operationAuthentical();
 		log.info("POST | {} | save | Verificando se documento já existe", name);
-		Boolean exist = service.findById(entity.getId()) != null;
+		Document model = entity.toModel();
+		Boolean exist = service.findById(model.getId()) != null;
 		if(!exist) {
-			Document saved = service.save(entity);
-			if (entity instanceof AbstractModelAuditable) {
-				AbstractModelAuditable object = (AbstractModelAuditable) entity;
-				log.info("POST | {} | save | Documento {} salvo com sucesso pelo usuário {}.", name, entity.getId(),
+			Document saved = service.save(model);
+			if (entity instanceof AbstractModelAuditableResource) {
+				this.onSave(entity);
+				AbstractModelAuditableResource object = (AbstractModelAuditableResource) entity;
+				log.info("POST | {} | save | Documento {} salvo com sucesso pelo usuário {}.", name, model.getId(),
 						object.getCreatedBy());
 			} else {
-				log.info("POST | {} | save | Documento {} salvo com sucesso.", name, entity.getId());
+				log.info("POST | {} | save | Documento {} salvo com sucesso.", name, model.getId());
 			}
 			return new ResponseEntity<>(saved, CREATED);
 		} else {
-			log.info("POST | {} | save | Documento de id {} já existe, executando update...", name, entity.getId());
-			Document updated = service.update(entity);
+			log.info("POST | {} | save | Documento de id {} já existe, executando update...", name, model.getId());
+			this.onUpdate(entity);
+			Document updated = service.update(model);
 			return new ResponseEntity<>(updated, OK);
 		}
 	}
 	
 	@PostMapping("/all")
 	@Operation(description = "Save or update multiple documents")
-	public ResponseEntity<?> saveAll(@RequestBody @Valid @Parameter(description = "A document json list that will be all saved on the database") List<Document> entities) {
+	public ResponseEntity<?> saveAll(@RequestBody @Valid @Parameter(description = "A document json list that will be all saved on the database") List<Resource> entities) {
 		this.operationAuthentical();
 		log.info("POST | {} | saveAll | Verificando documentos já existentes e documentos novos", name);
-		List<Document> unsaved = entities.stream().filter(entity -> !service.existsById(entity.getId())).collect(toList());
-		List<Document> saved = entities.stream().filter(entity -> !unsaved.contains(entity)).collect(toList());
+		List<Resource> unsaved = entities.stream().filter(entity -> !service.existsById(entity.toModel().getId())).collect(toList());
+		List<Resource> saved = entities.stream().filter(entity -> !unsaved.contains(entity)).collect(toList());
 		List<Document> documents = new ArrayList<Document>();
 		if(!unsaved.isEmpty()) {
+			this.onSave(unsaved);
 			log.info("POST | {} | saveAll | Salvando {} novos documentos", name, unsaved.size());
-			documents.addAll(service.save(unsaved));
+			documents.addAll(service.save(toModels(unsaved)));
 			log.info("POST | {} | saveAll | {} documentos salvos com sucesso!", name, unsaved.size());
 		}
 		if(!saved.isEmpty()) {
+			this.onUpdate(saved);
 			log.info("POST | {} | saveAll | Atualizando {} novos documentos", name, saved.size());
-			documents.addAll(service.update(saved));
+			documents.addAll(service.update(toModels(saved)));
 			log.info("POST | {} | saveAll | {} documentos atualizados com sucesso!", name, saved.size());
 		}
 		return ok(documents);
@@ -170,7 +176,7 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 	@DeleteMapping("/all")
 	@Operation(description = "Delete multiple documents by document body or by ids list. If a list of ids was provided, the method will prioritize ids by performatic reasons")
 	public ResponseEntity<?> deleteAll(
-			@RequestBody @Nullable @Valid @Parameter(description = "A document json list that will be all deleted on the database") List<Document> entities,
+			@RequestBody @Nullable @Valid @Parameter(description = "A document json list that will be all deleted on the database") List<Resource> entities,
 			@RequestParam @Nullable @Parameter(description = "A document json list ids that will be all deleted on the database")  List<String> ids) {
 		this.operationAuthentical();
 		if(ids != null && !ids.isEmpty()) {
@@ -181,7 +187,7 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 		}
 		if(entities != null && !entities.isEmpty()) {
 			log.info("DELETE | {} | deleteAll | Deletando {} documentos", name, entities.size());
-			service.deleteAll(entities);
+			service.deleteAll(toModels(entities));
 			log.info("DELETE | {} | deleteAll | {} documentos deletados com sucesso!", name, entities.size());
 			return ok().build();
 		}
@@ -190,27 +196,30 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 	
 	@PostMapping("/update")
 	@Operation(description = "Update a document")
-	public ResponseEntity<?> update(@RequestBody @Valid @Parameter(description = "A document json that will be updated on the database") Document entity) {
+	public ResponseEntity<?> update(@RequestBody @Valid @Parameter(description = "A document json that will be updated on the database") Resource entity) {
 		this.operationAuthentical();
-		log.info("POST | {} | update | Atualizando o documento com o id: {}", name, entity.getId());
-		Document updated = service.update(entity);
+		Document model = entity.toModel();
+		this.onUpdate(entity);
+		log.info("POST | {} | update | Atualizando o documento com o id: {}", name, model.getId());
+		Document updated = service.update(model);
 		if (updated instanceof AbstractModelAuditable) { 
 			@SuppressWarnings("rawtypes")
-			AbstractModelAuditable object = (AbstractModelAuditable) entity;
-			log.info("POST | {} | update | Documento {} atualizado com sucesso pelo usuário {}!", name, entity.getId(), object.getUpdatedBy());
+			AbstractModelAuditable object = (AbstractModelAuditable) model;
+			log.info("POST | {} | update | Documento {} atualizado com sucesso pelo usuário {}!", name, model.getId(), object.getUpdatedBy());
 			return new ResponseEntity<>(updated, OK);
 		}
-		log.info("POST | {} | update | Documento {} atualizado com sucesso!", name, entity.getId());
+		log.info("POST | {} | update | Documento {} atualizado com sucesso!", name, model.getId());
 		return new ResponseEntity<>(updated, OK);
 	}
 	
 	@DeleteMapping
 	@Operation(description = "Delete a document")
-	public ResponseEntity<?> delete(@RequestBody @Parameter(description = "A document json that will be deleted on the database") Document entity) {
+	public ResponseEntity<?> delete(@RequestBody @Parameter(description = "A document json that will be deleted on the database") Resource entity) {
 		this.operationAuthentical();
-		log.info("DELETE | {} | delete | Deletando documento", name);
-		service.delete(entity);
-		log.info("DELETE | {} | delete | Documento {} deletado com sucesso!", name, entity.getId());
+		Document model = entity.toModel();
+		log.info("DELETE | {} | delete | Deletando documento", name);	
+		service.delete(model);
+		log.info("DELETE | {} | delete | Documento {} deletado com sucesso!", name, model.getId());
 		return ok().build();
 	}
 
@@ -222,6 +231,26 @@ public abstract class AbstractController<Document extends AbstractModel<?>, Reso
 		service.deleteById(id);
 		log.info("DELETE | {} | deleteById | Documento de id {} deletado com sucesso!", name, id);
 		return ok().build();
+	}
+	
+	protected void onUpdate(List<Resource> entities) {
+		// Optional
+	}
+	
+	protected void onUpdate(Resource entity) {
+		// Optional
+	}
+	
+	protected void onSave(List<Resource> entities) {
+		// Optional
+	}
+	
+	protected void onSave(Resource entity) {
+		// Optional
+	}
+	
+	protected List<Document> toModels(List<Resource> entities) {
+		return entities.stream().map(entity -> entity.toModel()).collect(toList());
 	}
 	
 	protected void operationAuthentical() {

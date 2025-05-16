@@ -12,7 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.sst.abstracts.model.auditable.AbstractModelAuditable;
 import com.sst.model.responsible.Responsible;
-import com.sst.type.status.StatusType;
+import com.sst.enums.StatusType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

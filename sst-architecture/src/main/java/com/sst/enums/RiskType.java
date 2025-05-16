@@ -1,4 +1,4 @@
-package com.sst.type.risk;
+package com.sst.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

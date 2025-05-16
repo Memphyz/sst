@@ -2,7 +2,7 @@ package com.sst.api.v1.test.iar;
 
 import static com.sst.enums.InvalidEntityMessageType.DIRTY;
 import static com.sst.enums.InvalidEntityMessageType.MISSING;
-import static com.sst.type.risk.RiskType.CHEMICAL;
+import static com.sst.enums.RiskType.CHEMICAL;
 import static com.sst.utils.RestAssuredUtil.post;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;

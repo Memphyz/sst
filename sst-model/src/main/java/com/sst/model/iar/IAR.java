@@ -8,8 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.sst.abstracts.model.auditable.AbstractModelAuditable;
 import com.sst.model.responsible.Responsible;
 import com.sst.model.sector.Sector;
-import com.sst.type.level.LevelType;
-import com.sst.type.risk.RiskType;
+import com.sst.enums.LevelType;
+import com.sst.enums.RiskType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;

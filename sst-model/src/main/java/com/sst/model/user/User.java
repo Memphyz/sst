@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sst.abstracts.model.auditable.AbstractModelAuditable;
 import com.sst.enums.user.permission.UserPermissionType;
-import com.sst.type.status.StatusType;
+import com.sst.enums.StatusType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;

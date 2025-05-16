@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 import com.sst.abstracts.resource.AbstractResource;
 import com.sst.enums.user.permission.UserPermissionType;
 import com.sst.model.user.User;
-import com.sst.type.status.StatusType;
+import com.sst.enums.StatusType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
