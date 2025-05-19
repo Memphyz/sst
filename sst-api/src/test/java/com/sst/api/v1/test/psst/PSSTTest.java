@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Test;
@@ -81,11 +80,8 @@ public class PSSTTest extends AbstractTest<PSSTController> {
 		resource.setCcMails(null);
 		ExceptionResponse response = post(baseUrl, resource, ExceptionResponse.class, getAuthHeader());
 		assertInstanceOf(ExceptionResponse.class, response);
-		assertEquals(response.getMessage(), "NOT_EMPTY: ccMails");
+		assertEquals(response.getMessage(), MISSING.get("ccMails"));
 		assertEquals(response.getType(), RESOURCE_VALIDATION.getMessage());
-		List<String> ccs = new ArrayList<String>();
-		ccs.add("email@test.com");
-		resource.setCcMails(ccs);
 	}
 	
 	@Test
@@ -95,11 +91,8 @@ public class PSSTTest extends AbstractTest<PSSTController> {
 		resource.setCcMails(new ArrayList<String>());
 		ExceptionResponse response = post(baseUrl, resource, ExceptionResponse.class, getAuthHeader());
 		assertInstanceOf(ExceptionResponse.class, response);
-		assertEquals(response.getMessage(), "NOT_EMPTY: ccMails");
+		assertEquals(response.getMessage(), MISSING.get("ccMails"));
 		assertEquals(response.getType(), RESOURCE_VALIDATION.getMessage());
-		List<String> ccs = new ArrayList<String>();
-		ccs.add("email@test.com");
-		resource.setCcMails(ccs);
 	}
 
 }

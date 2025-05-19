@@ -68,7 +68,6 @@ public class PSST extends AbstractModelAuditable<String>{
 	@NotNull
 	private StatusType status;
 	
-	@NotEmpty
 	private List<String> ccMails;
 	
 	@DBRef(db = "user")

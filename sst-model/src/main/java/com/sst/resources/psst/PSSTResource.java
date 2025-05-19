@@ -72,7 +72,6 @@ public class PSSTResource extends AbstractModelAuditableResource<PSST, PSSTResou
 	@NotNull
 	private User elaborator;
 	
-	@NotEmpty
 	private List<String> ccMails;
 
 	@DBRef(db = "user")
