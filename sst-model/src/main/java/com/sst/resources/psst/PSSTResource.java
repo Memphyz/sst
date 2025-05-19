@@ -62,7 +62,6 @@ public class PSSTResource extends AbstractModelAuditableResource<PSST, PSSTResou
 	@Pattern(regexp = "^\\d+\\.\\d+$")
 	private String previeusVersion;
 
-	@NotNull
 	@Future
 	private LocalDate revisionDate;
 
@@ -101,7 +100,6 @@ public class PSSTResource extends AbstractModelAuditableResource<PSST, PSSTResou
 	@Size(min = 16, max = 500)
 	private String document;
 
-	@NotBlank
 	@Size(min = 5, max = 500)
 	private String reasonRevision;
 

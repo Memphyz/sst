@@ -122,7 +122,8 @@ public abstract class AbstractMockTest<Controller extends AbstractController<?, 
 			}
 			return instance;
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to create a mock for: " + type, e);
+			e.printStackTrace();
+			throw new RuntimeException("Failed to create a mock for: " + type);
 		}
 	}
 	

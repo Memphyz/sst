@@ -90,7 +90,6 @@ public class ExceptionHandler {
 	@org.springframework.web.bind.annotation.ExceptionHandler(MethodArgumentNotValidException.class)
 	public final ResponseEntity<ExceptionResponse> handleException(MethodArgumentNotValidException ex,
 			WebRequest request) {
-		ex.printStackTrace();
 		String message = toSkakeCase(ex.getFieldError().getCode()).toUpperCase() + ": " + ex.getFieldError().getField();
 		String detail = String.join(", ",
 				ex.getFieldErrors().stream()
@@ -100,7 +99,7 @@ public class ExceptionHandler {
 								.filter(argument -> !(argument instanceof DefaultMessageSourceResolvable))
 								.map(argument -> argument.toString()).toList())
 						+ "]").toList());
-		ExceptionResponse response = getException(message, detail, UNKNOWN);
+		ExceptionResponse response = getException(message, detail, RESOURCE_VALIDATION);
 		return new ResponseEntity<ExceptionResponse>(response, INTERNAL_SERVER_ERROR);
 	}
 	
@@ -108,12 +107,6 @@ public class ExceptionHandler {
 	public final ResponseEntity<ExceptionResponse> handleException(DuplicateKeyException ex, WebRequest request) {
 		ExceptionResponse response = getException(ex, request, ALREADY_EXISTS);
 		return new ResponseEntity<ExceptionResponse>(response, CONFLICT);
-	}
-
-	@org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
-	public final ResponseEntity<ExceptionResponse> handleException(Exception ex, WebRequest request) {
-		ExceptionResponse response = getException(ex, request, UNKNOWN);
-		return new ResponseEntity<ExceptionResponse>(response, INTERNAL_SERVER_ERROR);
 	}
 
 	@org.springframework.web.bind.annotation.ExceptionHandler(TokenExpiredException.class)
@@ -132,6 +125,12 @@ public class ExceptionHandler {
 	public final ResponseEntity<ExceptionResponse> handleException(ResourceValidationException ex, WebRequest request) {
 		ExceptionResponse response = getException(ex, request, RESOURCE_VALIDATION);
 		return new ResponseEntity<ExceptionResponse>(response, UNPROCESSABLE_ENTITY);
+	}
+	
+	@org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
+	public final ResponseEntity<ExceptionResponse> handleException(Exception ex, WebRequest request) {
+		ExceptionResponse response = getException(ex, request, UNKNOWN);
+		return new ResponseEntity<ExceptionResponse>(response, INTERNAL_SERVER_ERROR);
 	}
 
 	public final ExceptionResponse getException(Exception ex, WebRequest request, ValidationMessagesType type) {
