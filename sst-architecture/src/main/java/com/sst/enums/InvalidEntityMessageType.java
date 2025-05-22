@@ -11,6 +11,7 @@ public enum InvalidEntityMessageType {
 	DIRTY("DIRTY"),
 	INVALID("INVALID"),
 	MUST_BE_GREATER_THAN("MUST_BE_GREATER_THAN"),
+	MUST_BE_DIFFERENT("MUST_BE_DIFFERENT"),
 	MISSING("MISSING");
 	
 	private String type;
